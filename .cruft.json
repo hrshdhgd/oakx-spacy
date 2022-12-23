@@ -1,0 +1,22 @@
+{
+  "template": "https://github.com/INCATools/oakx-plugin-cookiecutter",
+  "commit": "2e912a7e3a46af6ddfe78123302bf080a1532336",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "oakx-spacy",
+      "__project_slug": "oakx_spacy",
+      "scheme": "spacy",
+      "implementation": "SpacyImplementation",
+      "implementation_name": "spacy_implementation",
+      "project_description": "Spacy plugin for OAK",
+      "file_name": "main",
+      "greeting_recipient": "World",
+      "author": "Harshad Hegde <hhegde@lbl.gov>",
+      "github_token_for_doc_deployment": "GH_TOKEN",
+      "github_token_for_pypi_deployment": "PYPI_TOKEN",
+      "_template": "https://github.com/INCATools/oakx-plugin-cookiecutter"
+    }
+  },
+  "directory": null
+}
