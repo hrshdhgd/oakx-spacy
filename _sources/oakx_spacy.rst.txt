@@ -1,0 +1,29 @@
+oakx\_spacy package
+===================
+
+Submodules
+----------
+
+oakx\_spacy.cli module
+----------------------
+
+.. automodule:: oakx_spacy.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+oakx\_spacy.spacy\_implementation module
+----------------------------------------
+
+.. automodule:: oakx_spacy.spacy_implementation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: oakx_spacy
+   :members:
+   :undoc-members:
+   :show-inheritance:
