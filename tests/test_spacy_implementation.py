@@ -27,8 +27,5 @@ class TestSpacyImplementation(unittest.TestCase):
     def test_annotate_text(self):
         """Test annotation of text."""
         results = list(self.impl.annotate_text(self.input_words, self.configuration))
-        import pdb
-
-        pdb.set_trace()
         self.assertEqual(len(results), 13)
         self.assertTrue("C0054952" in [x.subject_text_id for x in results])
