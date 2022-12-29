@@ -4,7 +4,6 @@ import logging
 import click
 
 from oakx_spacy import __version__
-from oakx_spacy.spacy_implementation import SpacyImplementation
 
 __all__ = [
     "main",
@@ -31,13 +30,6 @@ def main(verbose: int, quiet: bool):
         logger.setLevel(level=logging.WARNING)
     if quiet:
         logger.setLevel(level=logging.ERROR)
-
-
-@main.command()
-def run():
-    """Run the oakx-spacy's demo command."""
-    impl = SpacyImplementation()
-    print(impl)
 
 
 if __name__ == "__main__":
