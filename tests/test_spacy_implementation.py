@@ -14,17 +14,21 @@ class TestSpacyImplementation(unittest.TestCase):
         self.impl = get_implementation_from_shorthand("spacy:")
         self.input_file = Path(__file__).resolve().parents[1] / "tests/input/text.txt"
         self.impl.output_dir = Path(__file__).resolve().parents[1] / "tests/output/"
-        self.input_words = "cultured organisms polar ecosystems atmospheric gas exchange"
+        self.input_words = "Myeloid derived suppressor cells (MDSC) \
+            are immature myeloid cells with immunosuppressive activity."
         self.configuration = TextAnnotationConfiguration()
 
     def test_annotate_file(self):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_file, self.configuration))
-        self.assertEqual(len(results), 15)
-        self.assertTrue("C0009170" in [x.subject_text_id for x in results])
+        self.assertEqual(len(results), 20)
+        self.assertTrue("C1551088" in [x.subject_text_id for x in results])
 
     def test_annotate_text(self):
         """Test annotation of text."""
         results = list(self.impl.annotate_text(self.input_words, self.configuration))
-        self.assertEqual(len(results), 5)
-        self.assertTrue("C2347159" in [x.subject_text_id for x in results])
+        import pdb
+
+        pdb.set_trace()
+        self.assertEqual(len(results), 13)
+        self.assertTrue("C0054952" in [x.subject_text_id for x in results])

@@ -1,4 +1,15 @@
-# enums: 
+# enums:
+#   SpacyModelType:
+#       description: Pre-trained Spacy models for named-entity recognition.
+#       permissible_values:
+#         en_core_web_sm:
+#           description: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
+#         en_core_web_md:
+#           description: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
+#         en_core_web_lg:
+#           description: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
+#         en_core_web_trf:
+#           description: Components: transformer, tagger, parser, ner, attribute_ruler, lemmatizer.
 #   SciSpacyModelType:
 #       description: Pre-trained SciSpacy models for named-entity recognition.
 #       permissible_values:
@@ -32,5 +43,5 @@
 #       hpo:
 #         description: Links to the Human Phenotype Ontology. The Human Phenotype Ontology contains 16k concepts focused on phenotypic abnormalities encountered in human disease.
 
-model: en_ner_craft_md
+model: en_core_web_sm
 linker: umls

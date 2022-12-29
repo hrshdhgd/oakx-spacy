@@ -58,7 +58,7 @@ Avaliable Spacy Models: English pipelines optimized for CPU.
 #     "web_lg": "en_core_web_lg",
 #     "web_trf": "en_core_web_trf",
 # }
-DEFAULT_MODEL = "en_ner_craft_md"
+DEFAULT_MODEL = "en_core_web_sm"
 
 """
 Available linkers:

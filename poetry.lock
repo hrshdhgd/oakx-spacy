@@ -595,24 +595,6 @@ files = [
 ]
 
 [[package]]
-name = "en-ner-craft-md"
-version = "0.5.1"
-description = "Spacy Models for Biomedical Text."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "en_ner_craft_md-0.5.1.tar.gz", hash = "sha256:9b2efabb908b1a340caf8f80a2e690daab42ee7bbee852d156cd627e8ae2d91d"},
-]
-
-[package.dependencies]
-spacy = ">=3.4.1,<3.5.0"
-
-[package.source]
-type = "url"
-url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz"
-
-[[package]]
 name = "et-xmlfile"
 version = "1.1.0"
 description = "An implementation of lxml.xmlfile for the standard library"
@@ -3993,4 +3975,4 @@ docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx-click"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "e90a48586300fc67406c00622f8f8f236bc943f0b5d39d01282cd23324ead1af"
+content-hash = "fdc995b1ce113c516ec75aad08e79f1f62f561c6d9c86e6efd21364970fa2915"
