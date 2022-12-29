@@ -95,25 +95,46 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="oakx_spacy.spacy_implementation.SpacyImplementation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">oakx_spacy.spacy_implementation.</span></span><span class="sig-name descname"><span class="pre">SpacyImplementation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multilingual=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preferred_language=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autosave=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_owl_top_and_bottom=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ontology_metamodel_mapper=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_converter=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#oakx_spacy.spacy_implementation.SpacyImplementation" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasicOntologyInterface</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TextAnnotatorInterface</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">OboGraphInterface</span></code></p>
 <p>Spacy Implementation.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="oakx_spacy.spacy_implementation.SpacyImplementation.autosave">
-<span class="sig-name descname"><span class="pre">autosave</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#oakx_spacy.spacy_implementation.SpacyImplementation.autosave" title="Permalink to this definition"></a></dt>
-<dd><p>For adapters that wrap a transactional source (e.g sqlite), this controls
-whether results should be auto-committed after each operation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="oakx_spacy.spacy_implementation.SpacyImplementation.annotate_file">
+<span class="sig-name descname"><span class="pre">annotate_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#oakx_spacy.spacy_implementation.SpacyImplementation.annotate_file" title="Permalink to this definition"></a></dt>
+<dd><p>Annotate text from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – Text to be annotated.</p></li>
+<li><p><strong>configuration</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">TextAnnotationConfiguration</span></code>) – TextAnnotationConfiguration , defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yield</dt>
+<dd class="field-even"><p>Annotated result</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TextAnnotation</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="oakx_spacy.spacy_implementation.SpacyImplementation.exclude_owl_top_and_bottom">
-<span class="sig-name descname"><span class="pre">exclude_owl_top_and_bottom</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#oakx_spacy.spacy_implementation.SpacyImplementation.exclude_owl_top_and_bottom" title="Permalink to this definition"></a></dt>
-<dd><p>Do not include owl:Thing or owl:Nothing</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="oakx_spacy.spacy_implementation.SpacyImplementation.preferred_language">
-<span class="sig-name descname"><span class="pre">preferred_language</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#oakx_spacy.spacy_implementation.SpacyImplementation.preferred_language" title="Permalink to this definition"></a></dt>
-<dd><p>The preferred language for labels and other lexical entities</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="oakx_spacy.spacy_implementation.SpacyImplementation.annotate_text">
+<span class="sig-name descname"><span class="pre">annotate_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#oakx_spacy.spacy_implementation.SpacyImplementation.annotate_text" title="Permalink to this definition"></a></dt>
+<dd><p>Annotate text from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Text to be annotated.</p></li>
+<li><p><strong>configuration</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">TextAnnotationConfiguration</span></code>) – TextAnnotationConfiguration , defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yield</dt>
+<dd class="field-even"><p>Annotated result</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TextAnnotation</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
