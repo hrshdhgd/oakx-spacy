@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oakx-spacy"
-version = "0.1.0"
+version = "0.0.0"
 description = "oakx-spacy"
 authors = ["Harshad Hegde <hhegde@lbl.gov>"]
 license = "BSD 3"
