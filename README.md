@@ -54,7 +54,7 @@ These come preinstalled with `scispacy` package itself. Available linkers are:
 
 #### Clone the repository
 ```
-git clone https://github.com/hrshdhgd/oakx-spacy
+git clone https://github.com/hrshdhgd/oakx-spacy.git
 ```
 
 #### Install `poetry`
