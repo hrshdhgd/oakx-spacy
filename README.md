@@ -27,7 +27,7 @@ In order to install any of the below run `python -m spacy download en_core_web_x
 #### SciSpacy models
 In order to install any of the below use the corresponding line in [`pyproject.toml`](https://github.com/hrshdhgd/oakx-spacy/blob/main/pyproject.toml#L35-L65)
 
-For example, if the desired model is the CRAFT corpus, do the following:
+For example, if CRAFT corpus trained model is desired, do the following:
 ```
 pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz
 ```
