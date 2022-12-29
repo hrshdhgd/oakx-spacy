@@ -7,7 +7,7 @@
 ## Usage
 
 ### Non-developers:
-Create a preferred virtual environment. Install `oakx-spacy` using `pip install`.
+Create a preferred virtual environment (`conda`, `poetry`, `venv` etc.). Install `oakx-spacy` using `pip install`.
 ```
 pip install oakx-spacy
 ```
