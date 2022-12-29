@@ -82,7 +82,7 @@ Available linkers:
 """
 DEFAULT_LINKER = "umls"
 # ! CLI command:
-#   runoak -i spacy: annotate --text-file tests/input/test.txt -c config.yaml
+#   runoak -i spacy: annotate --text-file tests/input/text.txt -c config.yaml
 
 
 @dataclass
@@ -107,7 +107,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         :param configuration: TextAnnotationConfiguration , defaults to None
         :yield: Annotated result
         """
-        for line in text_file.readlines():  # type: ignore
+        for line in text_file.read_text():  # type: ignore
             yield from self.annotate_text(line, configuration)
 
     def annotate_text(

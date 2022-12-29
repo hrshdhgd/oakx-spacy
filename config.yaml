@@ -33,4 +33,4 @@
 #         description: Links to the Human Phenotype Ontology. The Human Phenotype Ontology contains 16k concepts focused on phenotypic abnormalities encountered in human disease.
 
 model: en_ner_craft_md
-linker: go
+linker: umls
