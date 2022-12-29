@@ -12,8 +12,7 @@ Create a preferred virtual environment (`conda`, `poetry`, `venv` etc.). Install
 pip install oakx-spacy
 ```
 
-Now desired models (Spacy or SciSpacy) need to be downloaded/installed. Following is the list of models
-available.
+Next, desired models (Spacy and/or SciSpacy) need to be downloaded/installed. Following is the list of models available.
 
 #### Spacy models
 English pipelines optimized for CPU.
@@ -78,14 +77,14 @@ poetry install
 #### Spacy models
 Instructions similar to non-developers. Just make sure to prepend the command by `poetry run`
 
-For now the default model used is `en_core_web_sm` and defaut linker is `umls`.
+The default model is set to `en_core_web_sm` and default linker to `umls`.
 
 ## How it works
 
-There are two possible inputs to this wrapper:
+There are two possible inputs to this plugin:
 1. A `.txt` file [`runoak -i spacy: annotate --text-file text.txt`]
 2. Words that need to be annotated.[`runoak -i spacy: Myeloid derived suppressor cells (MDSC) are immature myeloid cells with immunosuppressive activity.`]
-3. To use different combinations of models and linkers, the [config.yaml](https://github.com/hrshdhgd/oakx-spacy/blob/main/config.yaml#L35-L36) file can be edited and ` -c config.yaml` added at the end of the commands above .
+3. To use different combinations of models and linkers, the [config.yaml](https://github.com/hrshdhgd/oakx-spacy/blob/main/config.yaml#L35-L36) file can be edited and ` -c config.yaml` added at the end of the commands above.
 # Acknowledgements
 
 This [cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) project was developed from the [oakx-plugin-cookiecutter](https://github.com/INCATools/oakx-plugin-cookiecutter) template and will be kept up-to-date using [cruft](https://cruft.github.io/cruft/).
