@@ -28,7 +28,7 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Install basic spacy model en_core_web_sm
-        run: python -m spacy download en_core_web_sm
+        run: poetry run python -m spacy download en_core_web_sm
 
       - name: Check code quality with flake8
         run: poetry run tox -e flake8
