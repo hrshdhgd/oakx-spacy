@@ -1,5 +1,6 @@
 """Spacy Implementation."""
 from dataclasses import dataclass
+from io import TextIOWrapper
 from pathlib import Path
 from typing import Iterable
 
@@ -107,8 +108,12 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         :param configuration: TextAnnotationConfiguration , defaults to None
         :yield: Annotated result
         """
-        for line in text_file.read_text():  # type: ignore
-            yield from self.annotate_text(line, configuration)
+        if isinstance(text_file, TextIOWrapper):
+            for line in text_file.readlines():  # type: ignore
+                yield from self.annotate_text(line, configuration)
+        else:
+            for line in text_file.read_text():  # type: ignore
+                yield from self.annotate_text(line, configuration)
 
     def annotate_text(
         self, text: str, configuration: TextAnnotationConfiguration
