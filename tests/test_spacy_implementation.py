@@ -19,7 +19,10 @@ class TestSpacyImplementation(unittest.TestCase):
             are immature myeloid cells with immunosuppressive activity."
         self.config = TextAnnotationConfiguration()
 
-    @unittest.skipIf(os.getenv("GITHUB_ACTIONS") == True, "Got SIGTERM, handling it as a KeyboardInterrupt")
+    @unittest.skipIf(
+        os.getenv("GITHUB_ACTIONS") == True,
+        "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
+    )
     def test_annotate_file(self):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_file, self.config))
