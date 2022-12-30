@@ -77,7 +77,7 @@ poetry install
 #### Spacy models
 Instructions similar to non-developers. Just make sure to prepend the command by `poetry run`
 
-The default model is set to `en_core_web_sm` and default linker to `umls`.
+The default model is set to `en_ner_craft_md` and default linker to `umls`.
 
 ## How it works
 
