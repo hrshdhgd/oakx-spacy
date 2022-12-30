@@ -58,7 +58,7 @@ Avaliable Spacy Models: English pipelines optimized for CPU.
 3. en_core_web_lg: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
 4. en_core_web_trf: Components: transformer, tagger, parser, ner, attribute_ruler, lemmatizer.
 """
-DEFAULT_MODEL = "en_core_web_sm"
+DEFAULT_MODEL = "en_ner_craft_md"
 
 """
 Available linkers:
