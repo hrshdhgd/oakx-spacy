@@ -20,7 +20,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.config = TextAnnotationConfiguration()
 
     @unittest.skipIf(
-        os.getenv("GITHUB_ACTIONS") == True,
+        os.getenv("GITHUB_ACTIONS"),
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file(self):
