@@ -20,7 +20,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.config = TextAnnotationConfiguration()
 
     @unittest.skipIf(
-        os.getenv("GITHUB_ACTIONS") == True,
+        os.getenv("GITHUB_ACTIONS") == 'true',
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file(self):
@@ -30,7 +30,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertTrue("C1551088" in [x.subject_text_id for x in results])
 
     @unittest.skipIf(
-        os.getenv("GITHUB_ACTIONS") == True,
+        os.getenv("GITHUB_ACTIONS") == 'true',
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_text(self):
