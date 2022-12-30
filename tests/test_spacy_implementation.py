@@ -18,6 +18,7 @@ class TestSpacyImplementation(unittest.TestCase):
             are immature myeloid cells with immunosuppressive activity."
         self.configuration = TextAnnotationConfiguration()
 
+    @unittest.skip("TESTING")
     def test_annotate_file(self):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_file, self.configuration))
