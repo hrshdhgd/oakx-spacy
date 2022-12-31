@@ -32,8 +32,8 @@ spacy = "oakx_spacy.spacy_implementation:SpacyImplementation"
 
 ## SciSpacy NER models #################################################################
 # # A spaCy NER model trained on the CRAFT corpus.
-[tool.poetry.dependencies.en_ner_craft_md]
-url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz"
+# [tool.poetry.dependencies.en_ner_craft_md]
+# url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz"
 
 # # A spaCy NER model trained on the JNLPBA corpus.
 # [tool.poetry.dependencies.en_ner_jnlpba_md]
