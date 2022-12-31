@@ -1,5 +1,6 @@
 """Spacy Implementation."""
 from dataclasses import dataclass
+from io import TextIOWrapper
 from pathlib import Path
 from typing import Iterable
 
@@ -20,6 +21,19 @@ OX_SPACY_MODULE = pystow.module("oxpacy")
 SERIALIZED_DIR = OX_SPACY_MODULE.join("serialized")
 OUT_DIR = OX_SPACY_MODULE.join("output")
 OUT_FILE = "spacyOutput.tsv"
+SCI_SPACY_LINKERS = ["umls", "mesh", "go", "hpo", "rxnorm"]
+MODELS = [
+    "en_ner_craft_md",
+    "en_ner_jnlpba_md",
+    "en_ner_bc5cdr_md",
+    "en_ner_bionlp13cg_md",
+    "en_core_sci_scibert",
+    "en_core_sci_sm",
+    "en_core_sci_lg",
+    "en_core_web_sm",
+    "en_core_web_md",
+    "en_core_web_lg",
+]
 
 """
 Available SciSpacy models
@@ -44,20 +58,6 @@ Avaliable Spacy Models: English pipelines optimized for CPU.
 3. en_core_web_lg: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
 4. en_core_web_trf: Components: transformer, tagger, parser, ner, attribute_ruler, lemmatizer.
 """
-# MODEL_DICT = {
-#     "craft": "en_ner_craft_md",
-#     "jnlpba": "en_ner_jnlpba_md",
-#     "bc5cdr": "en_ner_bc5cdr_md",
-#     "bionlp13cg": "en_ner_bionlp13cg_md",
-#     "scibert": "en_core_sci_scibert",
-#     "bio_small": "en_core_sci_sm",
-#     "bio_medium": "en_core_sci_md",
-#     "bio_large": "en_core_sci_lg",
-#     "web_sm": "en_core_web_sm",
-#     "web_md": "en_core_web_md",
-#     "web_lg": "en_core_web_lg",
-#     "web_trf": "en_core_web_trf",
-# }
 DEFAULT_MODEL = "en_ner_craft_md"
 
 """
@@ -107,8 +107,12 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         :param configuration: TextAnnotationConfiguration , defaults to None
         :yield: Annotated result
         """
-        for line in text_file.read_text():  # type: ignore
-            yield from self.annotate_text(line, configuration)
+        if isinstance(text_file, TextIOWrapper):
+            for line in text_file.readlines():  # type: ignore
+                yield from self.annotate_text(line, configuration)
+        else:
+            for line in text_file.read_text():  # type: ignore
+                yield from self.annotate_text(line, configuration)
 
     def annotate_text(
         self, text: str, configuration: TextAnnotationConfiguration
@@ -158,11 +162,29 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             and configuration.plugin_configuration is not None
         ):
             if "model" in configuration.plugin_configuration:
-                self.model = configuration.plugin_configuration.model
+                if configuration.plugin_configuration.model in MODELS:
+                    self.model = configuration.plugin_configuration.model
+                else:
+                    raise (
+                        ValueError(
+                            f"Model provided "
+                            f"'{configuration.plugin_configuration.model}' is invalid."
+                            f"Choose one of the following: {MODELS}"
+                        )
+                    )
             else:
                 self.model = DEFAULT_MODEL
             if "linker" in configuration.plugin_configuration:
-                self.entity_linker = configuration.plugin_configuration.linker
+                if configuration.plugin_configuration.linker in SCI_SPACY_LINKERS:
+                    self.entity_linker = configuration.plugin_configuration.linker
+                else:
+                    raise (
+                        ValueError(
+                            f"SciSpacy linker provided "
+                            f"'{configuration.plugin_configuration.linker}' is invalid."
+                            f"Choose one of the following: {SCI_SPACY_LINKERS}"
+                        )
+                    )
             else:
                 self.entity_linker = DEFAULT_LINKER
         else:

@@ -1,4 +1,15 @@
-# enums: 
+# enums:
+#   SpacyModelType:
+#       description: Pre-trained Spacy models for named-entity recognition.
+#       permissible_values:
+#         en_core_web_sm:
+#           description: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
+#         en_core_web_md:
+#           description: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
+#         en_core_web_lg:
+#           description: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.
+#         en_core_web_trf:
+#           description: Components: transformer, tagger, parser, ner, attribute_ruler, lemmatizer.
 #   SciSpacyModelType:
 #       description: Pre-trained SciSpacy models for named-entity recognition.
 #       permissible_values:
