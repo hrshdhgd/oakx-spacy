@@ -160,7 +160,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                     )
 
     def _set_model_and_linker(self, configuration: TextAnnotationConfiguration) -> None:
-        if not self.entity_linker:
+        if not hasattr(self, "entity_linker"):
             self.entity_linker = DEFAULT_LINKER
 
         if hasattr(configuration, "model") and configuration.model is not None:
