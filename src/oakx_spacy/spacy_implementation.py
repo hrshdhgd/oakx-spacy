@@ -82,7 +82,7 @@ Available linkers:
 """
 DEFAULT_LINKER = "umls"
 # ! CLI command:
-#   runoak -i spacy: annotate --text-file tests/input/text.txt -m en_ner_craft_md
+#   runoak -i spacy: annotate --text-file tests/input/text.txt --model en_ner_craft_md
 
 
 @dataclass
