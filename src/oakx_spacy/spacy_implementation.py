@@ -33,7 +33,7 @@ MODELS = [
     "en_core_web_sm",
     "en_core_web_md",
     "en_core_web_lg",
-    "en_core_web_trf"
+    "en_core_web_trf",
 ]
 
 """
