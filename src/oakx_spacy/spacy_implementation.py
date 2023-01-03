@@ -82,7 +82,7 @@ Available linkers:
 """
 DEFAULT_LINKER = "umls"
 # ! CLI command:
-#   runoak -i spacy: annotate --text-file tests/input/text.txt -c config.yaml
+#   runoak -i spacy: annotate --text-file tests/input/text.txt -m en_ner_craft_md
 
 
 @dataclass
@@ -93,7 +93,10 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         """Post-instantiation the SpacyImplementation object."""
         if self.resource.slug:
             slug = self.resource.slug
-            self.oi = get_implementation_from_shorthand(slug)
+            if slug in SCI_SPACY_LINKERS:
+                self.entity_linker = slug
+            else:
+                self.oi = get_implementation_from_shorthand(slug)
         self.output_dir = OUT_DIR
 
     def annotate_file(
@@ -157,40 +160,27 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                     )
 
     def _set_model_and_linker(self, configuration: TextAnnotationConfiguration) -> None:
-        if (
-            hasattr(configuration, "plugin_configuration")
-            and configuration.plugin_configuration is not None
-        ):
-            if "model" in configuration.plugin_configuration:
-                if configuration.plugin_configuration.model in MODELS:
-                    self.model = configuration.plugin_configuration.model
-                else:
-                    raise (
-                        ValueError(
-                            f"Model provided "
-                            f"'{configuration.plugin_configuration.model}' is invalid."
-                            f"Choose one of the following: {MODELS}"
-                        )
-                    )
-            else:
-                self.model = DEFAULT_MODEL
-            if "linker" in configuration.plugin_configuration:
-                if configuration.plugin_configuration.linker in SCI_SPACY_LINKERS:
-                    self.entity_linker = configuration.plugin_configuration.linker
-                else:
-                    raise (
-                        ValueError(
-                            f"SciSpacy linker provided "
-                            f"'{configuration.plugin_configuration.linker}' is invalid."
-                            f"Choose one of the following: {SCI_SPACY_LINKERS}"
-                        )
-                    )
-            else:
-                self.entity_linker = DEFAULT_LINKER
-        else:
-            self.model = DEFAULT_MODEL
+        if not self.entity_linker:
             self.entity_linker = DEFAULT_LINKER
 
+        if (
+            hasattr(configuration, "model")
+            and configuration.model is not None
+        ):
+            self.model = configuration.model
+            if configuration.model in MODELS:
+                self.model = configuration.model
+            else:
+                raise (
+                    ValueError(
+                        f"Model provided "
+                        f"'{configuration.model}' is invalid."
+                        f"Choose one of the following: {MODELS}"
+                    )
+                )
+        else:
+            self.model = DEFAULT_MODEL
+            
         self.nlp = spacy.load(self.model)
         self.nlp.add_pipe("abbreviation_detector")
         self.nlp.add_pipe(

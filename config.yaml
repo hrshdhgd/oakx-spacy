@@ -42,6 +42,3 @@
 #         description: Links to the Gene Ontology. The Gene Ontology contains ~67k concepts focused on the functions of genes.
 #       hpo:
 #         description: Links to the Human Phenotype Ontology. The Human Phenotype Ontology contains 16k concepts focused on phenotypic abnormalities encountered in human disease.
-
-model: en_ner_craft_md
-linker: umls
