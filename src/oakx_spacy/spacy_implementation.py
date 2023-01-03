@@ -171,8 +171,9 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 raise (
                     ValueError(
                         f"Model provided "
-                        f"'{configuration.model}' is invalid."
+                        f"'{configuration.model}' is invalid. "
                         f"Choose one of the following: {MODELS}"
+                        f" OR verify if the desired model is installed."
                     )
                 )
         else:
