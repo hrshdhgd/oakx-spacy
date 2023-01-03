@@ -80,11 +80,10 @@ Instructions similar to non-developers. Just make sure to prepend the command by
 The default model is set to `en_ner_craft_md` and default linker to `umls`.
 
 ## How it works
-
+The input argument can be expressed as `spacy:linker-name` e.g. `spacy:mesh`.
 There are two possible inputs to this plugin:
 1. A `.txt` file [`runoak -i spacy: annotate --text-file text.txt`]
 2. Words that need to be annotated.[`runoak -i spacy: Myeloid derived suppressor cells (MDSC) are immature myeloid cells with immunosuppressive activity.`]
-3. To use different combinations of models and linkers, the [config.yaml](https://github.com/hrshdhgd/oakx-spacy/blob/main/config.yaml#L35-L36) file can be edited and ` -c config.yaml` added at the end of the commands above.
 # Acknowledgements
 
 This [cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) project was developed from the [oakx-plugin-cookiecutter](https://github.com/INCATools/oakx-plugin-cookiecutter) template and will be kept up-to-date using [cruft](https://cruft.github.io/cruft/).
