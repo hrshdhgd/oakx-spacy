@@ -28,7 +28,7 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Install en_ner_craft_md model
-        run: pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz
+        run: poetry run pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz
 
       - name: Check code quality with flake8
         run: poetry run tox -e flake8
