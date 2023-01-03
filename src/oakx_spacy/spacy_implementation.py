@@ -163,10 +163,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if not self.entity_linker:
             self.entity_linker = DEFAULT_LINKER
 
-        if (
-            hasattr(configuration, "model")
-            and configuration.model is not None
-        ):
+        if hasattr(configuration, "model") and configuration.model is not None:
             self.model = configuration.model
             if configuration.model in MODELS:
                 self.model = configuration.model
@@ -180,7 +177,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 )
         else:
             self.model = DEFAULT_MODEL
-            
+
         self.nlp = spacy.load(self.model)
         self.nlp.add_pipe("abbreviation_detector")
         self.nlp.add_pipe(
