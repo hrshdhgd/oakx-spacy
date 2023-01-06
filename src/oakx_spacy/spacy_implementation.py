@@ -1,7 +1,11 @@
 """Spacy Implementation."""
+import logging
+import pickle
+import re
 from dataclasses import dataclass
 from io import TextIOWrapper
 from pathlib import Path
+from timeit import default_timer as timer
 from typing import Iterable
 
 import pystow
@@ -12,6 +16,9 @@ from oaklib.interfaces.obograph_interface import OboGraphInterface
 from oaklib.selector import get_implementation_from_shorthand
 from scispacy.abbreviation import AbbreviationDetector  # noqa
 from scispacy.linking import EntityLinker  # noqa
+from spacy.matcher import PhraseMatcher
+from spacy.pipeline import entityruler  # noqa
+from spacy.util import filter_spans
 
 __all__ = [
     "SpacyImplementation",
@@ -20,7 +27,16 @@ __all__ = [
 OX_SPACY_MODULE = pystow.module("oxpacy")
 SERIALIZED_DIR = OX_SPACY_MODULE.join("serialized")
 OUT_DIR = OX_SPACY_MODULE.join("output")
+PIPELINE = OX_SPACY_MODULE.join("pipeline")
 OUT_FILE = "spacyOutput.tsv"
+TERMS_PICKLE = "terms.pickle"
+
+
+TERMS_PATH = SERIALIZED_DIR / TERMS_PICKLE
+CONFIG_FILE = PIPELINE / "config.cfg"
+
+PROJECT_DIR = Path(__file__).resolve().parents[2]
+STOPWORDS_PATH = PROJECT_DIR / "stopwords.txt"
 SCI_SPACY_LINKERS = ["umls", "mesh", "go", "hpo", "rxnorm"]
 MODELS = [
     "en_ner_craft_md",
@@ -98,7 +114,13 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 self.entity_linker = slug
             else:
                 self.oi = get_implementation_from_shorthand(slug)
+                self.phrase_matcher_attr = "LOWER"
+                patterns_fn = slug.split(":")[-1]
+                patterns = f"{patterns_fn}_patterns.jsonl"
+                self.patterns_path = SERIALIZED_DIR / patterns
+
         self.output_dir = OUT_DIR
+        self.stopwords = STOPWORDS_PATH.read_text().splitlines()
 
     def annotate_file(
         self,
@@ -131,39 +153,49 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             configuration = TextAnnotationConfiguration()
 
         if not hasattr(self, "nlp"):
-            self._set_model_and_linker(configuration)
+            self._setup_nlp_pipeline(configuration)
 
         doc = self.nlp(text.strip())
 
-        for entities in doc.ents:
-            for entity in entities.ents:
-                for id, confidence in entity._.kb_ents:
-                    linker_object = self.linker.kb.cui_to_entity[id]
-                    keys = [
-                        item
-                        for item in dir(linker_object)
-                        if not item.startswith("_") and item not in ["count", "index"]
-                    ]
-                    linker_dict = {k: linker_object.__getattribute__(k) for k in keys}
-                    if str(entity) in str(doc._.abbreviations):
-                        abrv = [item for item in doc._.abbreviations if str(item) == str(entity)][0]
-                        text = entities.text + " [" + str(abrv._.long_form) + "]"
-                    else:
-                        text = entities.text
+        if hasattr(self, "oi"):
+            for entity in doc.ents:
+                if entity.ent_id_ and entity.text not in self.stopwords:
                     yield TextAnnotation(
-                        subject_text_id=id,
-                        subject_label=text,
-                        subject_start=entities.start,
-                        subject_end=entities.end,
-                        confidence=confidence,
+                        subject_text_id=entity.ent_id_,
+                        subject_label=entity.text,
+                        subject_start=entity.start,
+                        subject_end=entity.end,
                         subject_source=entity.sent,
-                        info=linker_dict,
                     )
+        else:
+            for entities in doc.ents:
+                for entity in entities.ents:
+                    for id, confidence in entity._.kb_ents:
+                        linker_object = self.linker.kb.cui_to_entity[id]
+                        keys = [
+                            item
+                            for item in dir(linker_object)
+                            if not item.startswith("_") and item not in ["count", "index"]
+                        ]
+                        linker_dict = {k: linker_object.__getattribute__(k) for k in keys}
+                        if str(entity) in str(doc._.abbreviations):
+                            abrv = [
+                                item for item in doc._.abbreviations if str(item) == str(entity)
+                            ][0]
+                            text = entities.text + " [" + str(abrv._.long_form) + "]"
+                        else:
+                            text = entities.text
+                        yield TextAnnotation(
+                            subject_text_id=id,
+                            subject_label=text,
+                            subject_start=entities.start,
+                            subject_end=entities.end,
+                            confidence=confidence,
+                            subject_source=entity.sent,
+                            info=linker_dict,
+                        )
 
-    def _set_model_and_linker(self, configuration: TextAnnotationConfiguration) -> None:
-        if not hasattr(self, "entity_linker"):
-            self.entity_linker = DEFAULT_LINKER
-
+    def _setup_nlp_pipeline(self, configuration: TextAnnotationConfiguration) -> None:
         if hasattr(configuration, "model") and configuration.model is not None:
             self.model = configuration.model
             if configuration.model in MODELS:
@@ -181,9 +213,104 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             self.model = DEFAULT_MODEL
 
         self.nlp = spacy.load(self.model)
-        self.nlp.add_pipe("abbreviation_detector")
-        self.nlp.add_pipe(
-            "scispacy_linker",
-            config={"resolve_abbreviations": True, "linker_name": self.entity_linker},
-        )
-        self.linker = self.nlp.get_pipe("scispacy_linker")
+
+        if hasattr(self, "oi"):
+            # Use ontology terms.
+            self._add_patterns()
+        else:
+            self.nlp.add_pipe("abbreviation_detector")
+            # Use SciSpacy.
+            if not hasattr(self, "entity_linker"):
+                self.entity_linker = DEFAULT_LINKER
+            self.nlp.add_pipe(
+                "scispacy_linker",
+                config={"resolve_abbreviations": True, "linker_name": self.entity_linker},
+            )
+            self.linker = self.nlp.get_pipe("scispacy_linker")
+
+    def _add_patterns(self):
+        if not self.patterns_path.is_file():
+            # # Terms dictionary
+            # self.terms = {
+            #     str(self.oi.label(curie)).lower(): {
+            #         "object_id": curie,
+            #         "object_label": self.oi.label(curie),
+            #         "alias_map": self.oi.alias_map_by_curie(curie),
+            #         "synonym_map": self.oi.synonym_map_for_curies(curie),
+            #     }
+            #     for curie in self.oi.entities(owl_type="owl:Class")
+            #     if self.oi.label(curie)
+            # }
+
+            # with open(TERMS_PATH, "wb") as t:
+            #     pickle.dump(self.terms, t)
+
+            # EntityRuler
+            # source: https://spacy.io/usage/rule-based-matching#entityruler-usage
+            self.list_of_pattern_dicts = []
+            for curie in self.oi.entities(owl_type="owl:Class"):
+                # Split phrases into individual tokens
+                if curie.startswith("<"):
+                    prefix = curie.split("_")[0].replace("<","")+ "_"
+                else:
+                    prefix = curie.split(":")[0]
+                    
+                phrase = str(self.oi.label(curie))
+                # split_tokens = re.split(r"-|;|:|,|\s", phrase)
+                split_tokens = phrase.split()
+
+                self.list_of_pattern_dicts.append(
+                    {
+                        "label": prefix,
+                        "pattern": [
+                            {self.phrase_matcher_attr: token.lower()}
+                            for token in split_tokens
+                        ],
+                        "id": curie,
+                    }
+                )
+
+                # Add full phrases
+                self.list_of_pattern_dicts.append(
+                    {
+                        "label": prefix,
+                        "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
+                        "id": curie,
+                    }
+                )
+
+                if "-" in phrase:
+                    phrase = phrase.replace("-"," ")
+                    split_tokens = phrase.split()
+                    self.list_of_pattern_dicts.append(
+                        {
+                            "label": prefix,
+                            "pattern": [
+                                {self.phrase_matcher_attr: token.lower()}
+                                for token in split_tokens
+                            ],
+                            "id": curie
+                        }
+                    )
+
+                    self.list_of_pattern_dicts.append(
+                        {
+                            "label": prefix,
+                            "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
+                            "id": curie
+                        }
+                    )
+                
+            ruler = self.nlp.add_pipe("entity_ruler", before="ner")
+            with self.nlp.select_pipes(enable="tagger"):
+                ruler.add_patterns(self.list_of_pattern_dicts)
+
+            ruler.to_disk(self.patterns_path)
+            
+            self.nlp.to_disk(PIPELINE)
+
+        else:
+            logging.info("Reading pickled files!")
+            # self.terms = pickle.load(open(TERMS_PATH, "rb"))
+            ruler = self.nlp.add_pipe("entity_ruler", before="ner").from_disk(self.patterns_path)
+            # self.list_of_doc_objects = pickle.load(open(DOCS_PATH, "rb"))
