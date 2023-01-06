@@ -1,11 +1,8 @@
 """Spacy Implementation."""
-import logging
-import pickle
-import re
+
 from dataclasses import dataclass
 from io import TextIOWrapper
 from pathlib import Path
-from timeit import default_timer as timer
 from typing import Iterable
 
 import pystow
@@ -16,9 +13,7 @@ from oaklib.interfaces.obograph_interface import OboGraphInterface
 from oaklib.selector import get_implementation_from_shorthand
 from scispacy.abbreviation import AbbreviationDetector  # noqa
 from scispacy.linking import EntityLinker  # noqa
-from spacy.matcher import PhraseMatcher
 from spacy.pipeline import entityruler  # noqa
-from spacy.util import filter_spans
 
 __all__ = [
     "SpacyImplementation",
@@ -30,6 +25,8 @@ OUT_DIR = OX_SPACY_MODULE.join("output")
 PIPELINE = OX_SPACY_MODULE.join("pipeline")
 OUT_FILE = "spacyOutput.tsv"
 TERMS_PICKLE = "terms.pickle"
+PHRASE_MATCHER_FILENAME = "phrase_matcher.pickle"
+PATTERNS_FILENAME = "patterns.jsonl"
 
 
 TERMS_PATH = SERIALIZED_DIR / TERMS_PICKLE
@@ -116,8 +113,10 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 self.oi = get_implementation_from_shorthand(slug)
                 self.phrase_matcher_attr = "LOWER"
                 patterns_fn = slug.split(":")[-1]
-                patterns = f"{patterns_fn}_patterns.jsonl"
+                patterns = f"{patterns_fn}_{PATTERNS_FILENAME}"
                 self.patterns_path = SERIALIZED_DIR / patterns
+                # self.phrase_matcher_path = SERIALIZED_DIR /
+                # f"{patterns_fn}_{PHRASE_MATCHER_FILENAME}"
 
         self.output_dir = OUT_DIR
         self.stopwords = STOPWORDS_PATH.read_text().splitlines()
@@ -229,6 +228,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             self.linker = self.nlp.get_pipe("scispacy_linker")
 
     def _add_patterns(self):
+        # phrase_pattern = []
+
         if not self.patterns_path.is_file():
             # # Terms dictionary
             # self.terms = {
@@ -251,10 +252,10 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             for curie in self.oi.entities(owl_type="owl:Class"):
                 # Split phrases into individual tokens
                 if curie.startswith("<"):
-                    prefix = curie.split("_")[0].replace("<","")+ "_"
+                    prefix = curie.split("_")[0].replace("<", "") + "_"
                 else:
                     prefix = curie.split(":")[0]
-                    
+
                 phrase = str(self.oi.label(curie))
                 # split_tokens = re.split(r"-|;|:|,|\s", phrase)
                 split_tokens = phrase.split()
@@ -263,8 +264,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                     {
                         "label": prefix,
                         "pattern": [
-                            {self.phrase_matcher_attr: token.lower()}
-                            for token in split_tokens
+                            {self.phrase_matcher_attr: token.lower()} for token in split_tokens
                         ],
                         "id": curie,
                     }
@@ -280,16 +280,15 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 )
 
                 if "-" in phrase:
-                    phrase = phrase.replace("-"," ")
+                    phrase = phrase.replace("-", " ")
                     split_tokens = phrase.split()
                     self.list_of_pattern_dicts.append(
                         {
                             "label": prefix,
                             "pattern": [
-                                {self.phrase_matcher_attr: token.lower()}
-                                for token in split_tokens
+                                {self.phrase_matcher_attr: token.lower()} for token in split_tokens
                             ],
-                            "id": curie
+                            "id": curie,
                         }
                     )
 
@@ -297,20 +296,33 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         {
                             "label": prefix,
                             "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
-                            "id": curie
+                            "id": curie,
                         }
                     )
-                
+
             ruler = self.nlp.add_pipe("entity_ruler", before="ner")
             with self.nlp.select_pipes(enable="tagger"):
                 ruler.add_patterns(self.list_of_pattern_dicts)
 
             ruler.to_disk(self.patterns_path)
-            
+
             self.nlp.to_disk(PIPELINE)
 
+            # # Phrase patterns
+            # phrase_pattern.append(self.nlp(str(self.oi.label(curie))))
+
         else:
-            logging.info("Reading pickled files!")
             # self.terms = pickle.load(open(TERMS_PATH, "rb"))
             ruler = self.nlp.add_pipe("entity_ruler", before="ner").from_disk(self.patterns_path)
             # self.list_of_doc_objects = pickle.load(open(DOCS_PATH, "rb"))
+
+            # phrase_pattern = [
+            #     self.nlp(str(self.oi.label(curie)).lower())
+            #     for curie in self.oi.entities(owl_type="owl:Class")
+            #     if self.oi.label(curie)
+            #     ]
+
+        # self.phrase_matcher = PhraseMatcher(self.nlp.vocab, attr=self.phrase_matcher_attr)
+        # self.phrase_matcher.add(self.resource.slug, None, *phrase_pattern)
+
+        # TODO: Check out `onto_tokenize` from spacy_module.py
