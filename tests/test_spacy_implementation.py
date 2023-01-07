@@ -33,5 +33,5 @@ class TestSpacyImplementation(unittest.TestCase):
     def test_annotate_text(self):
         """Test annotation of text."""
         results = list(self.impl.annotate_text(self.input_words, self.config))
-        self.assertEqual(len(results), 9)
+        self.assertEqual(len(results), 10)
         self.assertTrue("C0027022" in [x.subject_text_id for x in results])
