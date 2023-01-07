@@ -81,6 +81,27 @@ The default model is set to `en_ner_craft_md` and default linker to `umls`.
 
 ## How it works
 
+### Using an ontology
+The input argument can be expressed as `spacy:sqlite:obo:name-of-ontology` e.g. `spacy:sqlite:obo:bero`.
+1. A `.txt` file [`runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt`]
+2. Words that need to be annotated.[`runoak -i spacy:sqlite:obo:bero annotate Myeloid derived suppressor cells \(MDSC\) are immature myeloid cells with immunosuppressive activity.`] should yield:
+```
+subject_end: 30
+subject_label: Myeloid-Derived Suppressor Cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 0
+subject_text_id: NCIT:C129908
+
+---
+subject_end: 64
+subject_label: Immature Myeloid Cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 43
+subject_text_id: NCIT:C113503
+```
+
 ### Using SciSpacy.
 The input argument can be expressed as `spacy:linker-name` e.g. `spacy:mesh`.
 There are two possible inputs to this plugin:
@@ -124,26 +145,6 @@ subject_start: 52
 subject_text_id: C1510444
 ```
 
-### Using an ontology
-The input argument can be expressed as `spacy:sqlite:obo:name-of-ontology` e.g. `spacy:sqlite:obo:bero`.
-1. A `.txt` file [`runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt`]
-2. Words that need to be annotated.[`runoak -i spacy:sqlite:obo:bero annotate Myeloid derived suppressor cells \(MDSC\) are immature myeloid cells with immunosuppressive activity.`] should yield:
-```
-subject_end: 30
-subject_label: Myeloid-Derived Suppressor Cell
-subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
-  immunosuppressive activity .
-subject_start: 0
-subject_text_id: NCIT:C129908
-
----
-subject_end: 64
-subject_label: Immature Myeloid Cell
-subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
-  immunosuppressive activity .
-subject_start: 43
-subject_text_id: NCIT:C113503
-```
 # Acknowledgements
 
 This [cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) project was developed from the [oakx-plugin-cookiecutter](https://github.com/INCATools/oakx-plugin-cookiecutter) template and will be kept up-to-date using [cruft](https://cruft.github.io/cruft/).
