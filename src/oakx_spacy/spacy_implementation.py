@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from io import TextIOWrapper
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, List
 
 import pystow
 import spacy
@@ -28,7 +28,7 @@ TERMS_PICKLE = "terms.pickle"
 PHRASE_MATCHER_FILENAME = "phrase_matcher.pickle"
 PATTERNS_FILENAME = "patterns.jsonl"
 
-
+# REGEX_TO_FILTER_OUT = r"(\[|\]|\(|\)|)+"
 TERMS_PATH = SERIALIZED_DIR / TERMS_PICKLE
 CONFIG_FILE = PIPELINE / "config.cfg"
 
@@ -121,6 +121,11 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         self.output_dir = OUT_DIR
         self.stopwords = STOPWORDS_PATH.read_text().splitlines()
 
+    def _clean_string_and_lemma(self, string):
+        return " ".join([token.lemma_ for token in self.nlp(string)])
+        # tmp_str = re.sub(REGEX_TO_FILTER_OUT, '', string)
+        # return " ".join([token.lemma_ for token in self.nlp(tmp_str.replace('-'," "))])
+
     def annotate_file(
         self,
         text_file: Path,
@@ -154,16 +159,16 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if not hasattr(self, "nlp"):
             self._setup_nlp_pipeline(configuration)
 
-        doc = self.nlp(text.strip())
+        doc = self.nlp(self._clean_string_and_lemma(text))
 
         if hasattr(self, "oi"):
             for entity in doc.ents:
                 if entity.ent_id_ and entity.text not in self.stopwords:
                     yield TextAnnotation(
                         subject_text_id=entity.ent_id_,
-                        subject_label=entity.text,
-                        subject_start=entity.start,
-                        subject_end=entity.end,
+                        subject_label=entity.label_,
+                        subject_start=entity.start_char,
+                        subject_end=entity.end_char,
                         subject_source=entity.sent,
                     )
         else:
@@ -187,8 +192,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         yield TextAnnotation(
                             subject_text_id=id,
                             subject_label=text,
-                            subject_start=entities.start,
-                            subject_end=entities.end,
+                            subject_start=entities.start_char,
+                            subject_end=entities.end_char,
                             confidence=confidence,
                             subject_source=entity.sent,
                             info=linker_dict,
@@ -227,9 +232,24 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             )
             self.linker = self.nlp.get_pipe("scispacy_linker")
 
-    def _add_patterns(self):
-        # phrase_pattern = []
+    def _get_pattern_list(self, phrase, raw_phrase, curie) -> List[dict]:
+        split_tokens = phrase.split()
 
+        token_dict = {
+            "label": raw_phrase,
+            "pattern": [{self.phrase_matcher_attr: token.lower()} for token in split_tokens],
+            "id": curie,
+        }
+
+        phrase_dict = {
+            "label": raw_phrase,
+            "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
+            "id": curie,
+        }
+
+        return [token_dict, phrase_dict]
+
+    def _add_patterns(self):
         if not self.patterns_path.is_file():
             # # Terms dictionary
             # self.terms = {
@@ -251,78 +271,37 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             self.list_of_pattern_dicts = []
             for curie in self.oi.entities(owl_type="owl:Class"):
                 # Split phrases into individual tokens
-                if curie.startswith("<"):
-                    prefix = curie.split("_")[0].replace("<", "") + "_"
-                else:
-                    prefix = curie.split(":")[0]
+                # if curie.startswith("<"):
+                #     prefix = curie.split("_")[0].replace("<", "") + "_"
+                # else:
+                #     prefix = curie.split(":")[0]
 
-                phrase = str(self.oi.label(curie))
-                # split_tokens = re.split(r"-|;|:|,|\s", phrase)
-                split_tokens = phrase.split()
+                raw_phrase = str(self.oi.label(curie))
+                phrase = self._clean_string_and_lemma(raw_phrase)
+                # split_tokens = phrase.split()
 
-                self.list_of_pattern_dicts.append(
-                    {
-                        "label": prefix,
-                        "pattern": [
-                            {self.phrase_matcher_attr: token.lower()} for token in split_tokens
-                        ],
-                        "id": curie,
-                    }
+                self.list_of_pattern_dicts.extend(
+                    self._get_pattern_list(raw_phrase=raw_phrase, phrase=phrase, curie=curie)
                 )
-
-                # Add full phrases
-                self.list_of_pattern_dicts.append(
-                    {
-                        "label": prefix,
-                        "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
-                        "id": curie,
-                    }
-                )
-
                 if "-" in phrase:
                     phrase = phrase.replace("-", " ")
-                    split_tokens = phrase.split()
-                    self.list_of_pattern_dicts.append(
-                        {
-                            "label": prefix,
-                            "pattern": [
-                                {self.phrase_matcher_attr: token.lower()} for token in split_tokens
-                            ],
-                            "id": curie,
-                        }
+                    self.list_of_pattern_dicts.extend(
+                        self._get_pattern_list(raw_phrase=raw_phrase, phrase=phrase, curie=curie)
                     )
-
-                    self.list_of_pattern_dicts.append(
-                        {
-                            "label": prefix,
-                            "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
-                            "id": curie,
-                        }
-                    )
+                if "," in phrase and phrase.count(",") == 1 and not curie.startswith("CHEBI"):
+                    multi_phrase = phrase.split(",")
+                    for phr in multi_phrase:
+                        self.list_of_pattern_dicts.extend(
+                            self._get_pattern_list(raw_phrase=raw_phrase, phrase=phr, curie=curie)
+                        )
 
             ruler = self.nlp.add_pipe("entity_ruler", before="ner")
             with self.nlp.select_pipes(enable="tagger"):
                 ruler.add_patterns(self.list_of_pattern_dicts)
 
             ruler.to_disk(self.patterns_path)
-
             self.nlp.to_disk(PIPELINE)
-
-            # # Phrase patterns
-            # phrase_pattern.append(self.nlp(str(self.oi.label(curie))))
 
         else:
             # self.terms = pickle.load(open(TERMS_PATH, "rb"))
             ruler = self.nlp.add_pipe("entity_ruler", before="ner").from_disk(self.patterns_path)
-            # self.list_of_doc_objects = pickle.load(open(DOCS_PATH, "rb"))
-
-            # phrase_pattern = [
-            #     self.nlp(str(self.oi.label(curie)).lower())
-            #     for curie in self.oi.entities(owl_type="owl:Class")
-            #     if self.oi.label(curie)
-            #     ]
-
-        # self.phrase_matcher = PhraseMatcher(self.nlp.vocab, attr=self.phrase_matcher_attr)
-        # self.phrase_matcher.add(self.resource.slug, None, *phrase_pattern)
-
-        # TODO: Check out `onto_tokenize` from spacy_module.py
