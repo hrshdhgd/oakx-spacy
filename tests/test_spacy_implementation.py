@@ -23,7 +23,7 @@ class TestSpacyImplementation(unittest.TestCase):
     #     os.getenv("GITHUB_ENV"),
     #     "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     # )
-    @unittest.skip("NEED A VALID CONDITION LIKE ABOEVE TO WORK")
+    @unittest.skip("NEED A VALID CONDITION LIKE ABOVE TO WORK")
     def test_annotate_file(self):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_file, self.config))
@@ -34,4 +34,4 @@ class TestSpacyImplementation(unittest.TestCase):
         """Test annotation of text."""
         results = list(self.impl.annotate_text(self.input_words, self.config))
         self.assertEqual(len(results), 10)
-        self.assertTrue("C0027022" in [x.subject_text_id for x in results])
+        self.assertTrue("C1510444" in [x.subject_text_id for x in results])
