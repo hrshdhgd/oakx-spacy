@@ -80,10 +80,191 @@ Instructions similar to non-developers. Just make sure to prepend the command by
 The default model is set to `en_ner_craft_md` and default linker to `umls`.
 
 ## How it works
+
+### Using SciSpacy.
 The input argument can be expressed as `spacy:linker-name` e.g. `spacy:mesh`.
 There are two possible inputs to this plugin:
 1. A `.txt` file [`runoak -i spacy: annotate --text-file text.txt`]
-2. Words that need to be annotated.[`runoak -i spacy: Myeloid derived suppressor cells (MDSC) are immature myeloid cells with immunosuppressive activity.`]
+2. Words that need to be annotated.[`runoak -i spacy: annotate Myeloid derived suppressor cells \(MDSC\) are immature myeloid cells with immunosuppressive activity.`] should yield:
+```
+confidence: 0.9999999403953552
+info: JsonObj(aliases=['t cell suppressor', 'suppressor cell', 'T suppressor cell',
+  'suppressor cells', 'Suppressor cell', 'suppressor T lymphocyte', 'cells suppressor
+  t', 'Suppressor cells', 'Suppressor cell (cell)'], canonical_name='Suppressor T
+  Lymphocyte', concept_id='C0038856', definition='subpopulation of CD8+ T-lymphocytes
+  which suppress antibody production or inhibit cellular immune responses.', types=['T025'])
+subject_end: 30
+subject_label: suppressor cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 15
+subject_text_id: C0038856
+
+---
+confidence: 0.9177235960960388
+info: JsonObj(aliases=['nTregs', 'CD4+CD25+ regulatory T cells', 'T-regulatory cell',
+  'CD4+CD25+ T lymphocyte', 'Tr cell', 'regulatory T cell', 'CD4+CD25+ T Lymphocyte',
+  'T reg', 'suppressor T cell', 'CD4+ CD25+ Regulatory T Cells', 'T lymphocyte positive
+  for both CD4 antigen and CD25 antigen', 'T lymphocyte positive for both CD4 antigen
+  and CD25 antigen (cell)'], canonical_name='CD4+ CD25+ Regulatory T Cells', concept_id='C1267822',
+  definition='Regulatory T cells that express CD4 and CD25 (interleukin 2 receptor)
+  antigens, with immunomodulating activity. CD4+CD25+ T regulatory cells (Tregs),
+  a subset of CD4+ T cells expressing high levels of CD25 and the transcription factor
+  Foxp3, are essential in maintaining immunologic homeostasis, preventing autoimmunity
+  by suppressing self-reactive T cells; CD4+CD25+ Tregs may induce tolerance to allogeneic
+  organ transplants such as hematopoetic stem cell transplants (HSCTs).', types=['T025'])
+subject_end: 30
+subject_label: suppressor cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 15
+subject_text_id: C1267822
+
+---
+confidence: 0.9177235960960388
+info: JsonObj(aliases=['Suppressor-Effector T-Lymphocyte', 'Suppressor effector T
+  lymphocyte', 'T Suppressor Cell', 'Suppressor T Lymphocyte', 'Suppressor-Effector
+  T-Cells', 'Suppressor-Effector T-Lymphocytes'], canonical_name='Suppressor effector
+  T lymphocyte', concept_id='C2355611', definition='T-lymphocytes that respond to
+  signals from suppressor-inducer T-cells by inhibiting either cell-mediated immunity
+  or antibody production by B-cells.', types=['T025'])
+subject_end: 30
+subject_label: suppressor cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 15
+subject_text_id: C2355611
+
+---
+confidence: 0.8558955192565918
+info: JsonObj(aliases=['Suppressor', 'Suppressor Device'], canonical_name='Suppressor
+  Device', concept_id='C1710252', definition='An electrical device designed to reduce
+  or eliminate unwanted currents.', types=['T073'])
+subject_end: 30
+subject_label: suppressor cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 15
+subject_text_id: C1710252
+
+---
+confidence: 0.7574830651283264
+info: JsonObj(aliases=['Second-Site Suppressor Genes', 'Suppressor Genes, Second-Site',
+  'gene suppressor', 'Suppressor gene', 'Second Site Suppressor Genes', 'Second-Site
+  Suppressor Gene', 'Suppressor Gene', 'Genes, Second Site Suppressor', 'Gene, Second-Site
+  Suppressor', 'Genes, Second-Site Suppressor', 'suppressor gene', 'Suppressor gene
+  (substance)', 'Gene, Suppressor', 'Suppressor Genes', 'Suppressor Gene, Second-Site'],
+  canonical_name='Genes, Suppressor', concept_id='C0017372', definition='Genes that
+  have a suppressor allele or suppressor mutation (SUPPRESSION, GENETIC) which cancels
+  the effect of a previous mutation, enabling the wild-type phenotype to be maintained
+  or partially restored. For example, amber suppressors cancel the effect of an AMBER
+  NONSENSE MUTATION.', types=['T028'])
+subject_end: 30
+subject_label: suppressor cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 15
+subject_text_id: C0017372
+
+---
+confidence: 1.0
+info: JsonObj(aliases=['Bone Marrow Myeloid Stem Cell', 'Cell, Myeloid Stem', 'Cells,
+  Myeloid Stem', 'stem cells myeloid', 'Myeloid Stem Cells', 'Myeloid Progenitor Cell',
+  'Myeloid cell', 'Progenitor Cells, Myeloid', 'Stem Cell, Myeloid', 'Myeloid Progenitor
+  Cells', 'Stem Cells, Myeloid', 'Cells, Myeloid Progenitor', 'Progenitor Cell, Myeloid',
+  'myeloid stem cell', 'Myeloid Stem Cell', 'Cell, Myeloid Progenitor', 'Myeloid stem
+  cell'], canonical_name='Myeloid Progenitor Cells', concept_id='C0596993', definition='A
+  hematopoietic stem cell found in the bone marrow that is committed to form erythrocytes,
+  megakaryocytes, and all leukocytes except lymphocytes.', types=['T025'])
+subject_end: 64
+subject_label: myeloid cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 52
+subject_text_id: C0596993
+
+---
+confidence: 1.0
+info: JsonObj(aliases=['Cells, Myeloid', 'Myeloid Cells', 'myeloid cell', 'myeloid
+  cells', 'Myeloid Cell', 'Cell, Myeloid'], canonical_name='Myeloid Cells', concept_id='C0887899',
+  definition='The classes of BONE MARROW-derived blood cells in the monocytic series
+  (MONOCYTES and their precursors) and granulocytic series (GRANULOCYTES and their
+  precursors).', types=['T025'])
+subject_end: 64
+subject_label: myeloid cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 52
+subject_text_id: C0887899
+
+---
+confidence: 0.8978284001350403
+info: JsonObj(aliases=['Myeloid Stem Cell', 'Myeloid Colony Forming Unit', 'CFU-GEMM',
+  'Common Myeloid Progenitor Cell'], canonical_name='Myeloid Stem Cell', concept_id='C4761416',
+  definition='A stem cell derived from the hematopoietic stem cell that generates
+  myeloid cells (granulocyte, erythrocyte, monocyte, megakaryocyte).', types=['T025'])
+subject_end: 64
+subject_label: myeloid cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 52
+subject_text_id: C4761416
+
+---
+confidence: 0.8651273250579834
+info: JsonObj(aliases=['myelogenous', 'Myeloid', 'myeloid', 'Myelogenous', 'Myeloid
+  (qualifier value)'], canonical_name='Myeloid', concept_id='C0439677', definition='Having
+  to do with or resembling the bone marrow. May also refer to certain types of hematopoietic
+  (blood-forming) cells found in the bone marrow. Sometimes used as a synonym for
+  myelogenous; for example, acute myeloid leukemia and acute myelogenous leukemia
+  are the same disease.', types=['T080'])
+subject_end: 64
+subject_label: myeloid cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 52
+subject_text_id: C0439677
+
+---
+confidence: 0.8391554355621338
+info: JsonObj(aliases=['Myeloid Cell Leukemia Sequence 1', 'Myeloid Cell Leukemia
+  Sequence 1 Protein', 'Induced Myeloid Leukemia Cell Differentiation Protein Mcl-1',
+  'Myeloid Cell Factor-1', 'Myeloid Cell Factor 1', 'Induced Myeloid Leukemia Cell
+  Differentiation Protein Mcl 1', 'Factor-1, Myeloid Cell', 'Cell Factor-1, Myeloid'],
+  canonical_name='Myeloid Cell Leukemia Sequence 1 Protein', concept_id='C1510444',
+  definition='A member of the myeloid leukemia factor (MLF) protein family with multiple
+  alternatively spliced transcript variants encoding different protein isoforms. In
+  hematopoietic cells, it is located mainly in the nucleus, and in non-hematopoietic
+  cells, primarily in the cytoplasm with a punctate nuclear localization. MLF1 plays
+  a role in cell cycle differentiation.', types=['T116', 'T123'])
+subject_end: 64
+subject_label: myeloid cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 52
+subject_text_id: C1510444
+```
+
+### Using an ontology
+The input argument can be expressed as `spacy:sqlite:obo:name-of-ontology` e.g. `spacy:sqlite:obo:bero`.
+1. A `.txt` file [`runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt`]
+2. Words that need to be annotated.[`runoak -i spacy:sqlite:obo:bero annotate Myeloid derived suppressor cells \(MDSC\) are immature myeloid cells with immunosuppressive activity.`] should yield:
+```
+subject_end: 30
+subject_label: Myeloid-Derived Suppressor Cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 0
+subject_text_id: NCIT:C129908
+
+---
+subject_end: 64
+subject_label: Immature Myeloid Cell
+subject_source: myeloid derive suppressor cell ( mdsc ) be immature myeloid cell with
+  immunosuppressive activity .
+subject_start: 43
+subject_text_id: NCIT:C113503
+```
 # Acknowledgements
 
 This [cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) project was developed from the [oakx-plugin-cookiecutter](https://github.com/INCATools/oakx-plugin-cookiecutter) template and will be kept up-to-date using [cruft](https://cruft.github.io/cruft/).
