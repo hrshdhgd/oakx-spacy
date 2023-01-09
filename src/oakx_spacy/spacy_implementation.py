@@ -171,13 +171,17 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                                 info["alias_map"] = {item[0]: item[1]}
                             else:
                                 info["alias_map"].update({item[0]: item[1]})
-                        
-                    for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
+
+                    for _, item in enumerate(
+                        self.oi.synonym_map_for_curies(entity.ent_id_).items()
+                    ):
                         if len(item) > 0:
                             if "synonym" not in info:
                                 info["synonym_map"] = {item[0]: item[1]}
                             else:
                                 info["synonym_map"].update({item[0]: item[1]})
+
+                    # with open(OUT_FILE, "w") as o:
 
                     yield TextAnnotation(
                         subject_text_id=entity.ent_id_,
