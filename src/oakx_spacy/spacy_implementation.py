@@ -164,12 +164,28 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if hasattr(self, "oi"):
             for entity in doc.ents:
                 if entity.ent_id_ and entity.text not in self.stopwords:
+                    info = {}
+                    for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
+                        if len(item) > 0:
+                            if "alias" not in info:
+                                info["alias_map"] = {item[0]: item[1]}
+                            else:
+                                info["alias_map"].update({item[0]: item[1]})
+                        
+                    for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
+                        if len(item) > 0:
+                            if "synonym" not in info:
+                                info["synonym_map"] = {item[0]: item[1]}
+                            else:
+                                info["synonym_map"].update({item[0]: item[1]})
+
                     yield TextAnnotation(
                         subject_text_id=entity.ent_id_,
                         subject_label=entity.label_,
                         subject_start=entity.start_char,
                         subject_end=entity.end_char,
                         subject_source=entity.sent,
+                        info=info,
                     )
         else:
             for entities in doc.ents:
