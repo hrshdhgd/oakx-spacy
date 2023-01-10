@@ -1,5 +1,6 @@
 """Spacy Implementation."""
 
+import csv
 from dataclasses import dataclass
 from io import TextIOWrapper
 from pathlib import Path
@@ -14,6 +15,7 @@ from oaklib.selector import get_implementation_from_shorthand
 from scispacy.abbreviation import AbbreviationDetector  # noqa
 from scispacy.linking import EntityLinker  # noqa
 from spacy.pipeline import entityruler  # noqa
+from spacy.tokens import Span
 
 __all__ = [
     "SpacyImplementation",
@@ -21,7 +23,6 @@ __all__ = [
 
 OX_SPACY_MODULE = pystow.module("oxpacy")
 SERIALIZED_DIR = OX_SPACY_MODULE.join("serialized")
-OUT_DIR = OX_SPACY_MODULE.join("output")
 PIPELINE = OX_SPACY_MODULE.join("pipeline")
 OUT_FILE = "spacyOutput.tsv"
 TERMS_PICKLE = "terms.pickle"
@@ -97,6 +98,8 @@ Available linkers:
 DEFAULT_LINKER = "umls"
 # ! CLI command:
 #   runoak -i spacy: annotate --text-file tests/input/text.txt --model en_ner_craft_md
+#   OR
+#   runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt
 
 
 @dataclass
@@ -109,22 +112,53 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             slug = self.resource.slug
             if slug in SCI_SPACY_LINKERS:
                 self.entity_linker = slug
+                self.outfile = Path(f"{slug}_linked_{OUT_FILE}")
             else:
                 self.oi = get_implementation_from_shorthand(slug)
                 self.phrase_matcher_attr = "LOWER"
                 patterns_fn = slug.split(":")[-1]
                 patterns = f"{patterns_fn}_{PATTERNS_FILENAME}"
                 self.patterns_path = SERIALIZED_DIR / patterns
-                # self.phrase_matcher_path = SERIALIZED_DIR /
-                # f"{patterns_fn}_{PHRASE_MATCHER_FILENAME}"
+                self.outfile = Path(f"{patterns_fn}_based_{OUT_FILE}")
+        else:
+            slug = DEFAULT_LINKER
+            self.entity_linker = slug
+            self.outfile = Path(f"{slug}_linked_{OUT_FILE}")
 
-        self.output_dir = OUT_DIR
         self.stopwords = STOPWORDS_PATH.read_text().splitlines()
+        if (self.outfile).is_file():
+            self.outfile.unlink()
 
     def _clean_string_and_lemma(self, string):
         return " ".join([token.lemma_ for token in self.nlp(string)])
         # tmp_str = re.sub(REGEX_TO_FILTER_OUT, '', string)
         # return " ".join([token.lemma_ for token in self.nlp(tmp_str.replace('-'," "))])
+
+    def _prepare_output(self, entity: Span) -> dict:
+        info = {}
+        output_dict = {
+            "subject_id": entity.ent_id_,
+            "subject_label": entity.label_,
+            "start": entity.start_char,
+            "end": entity.end_char,
+            "sentence": entity.sent,
+        }
+        for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
+            if len(item) > 0:
+                if "alias" not in info:
+                    info["alias_map"] = {item[0]: item[1]}
+                else:
+                    info["alias_map"].update({item[0]: item[1]})
+
+        for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
+            if len(item) > 0:
+                if "synonym" not in info:
+                    info["synonym_map"] = {item[0]: item[1]}
+                else:
+                    info["synonym_map"].update({item[0]: item[1]})
+
+        output_dict.update(info)
+        return output_dict
 
     def annotate_file(
         self,
@@ -160,28 +194,26 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             self._setup_nlp_pipeline(configuration)
 
         doc = self.nlp(self._clean_string_and_lemma(text))
+        fieldnames = [
+            "subject_id",
+            "subject_label",
+            "start",
+            "end",
+            "sentence",
+            "alias_map",
+            "synonym_map",
+        ]
 
         if hasattr(self, "oi"):
             for entity in doc.ents:
                 if entity.ent_id_ and entity.text not in self.stopwords:
                     info = {}
-                    for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
-                        if len(item) > 0:
-                            if "alias" not in info:
-                                info["alias_map"] = {item[0]: item[1]}
-                            else:
-                                info["alias_map"].update({item[0]: item[1]})
-
-                    for _, item in enumerate(
-                        self.oi.synonym_map_for_curies(entity.ent_id_).items()
-                    ):
-                        if len(item) > 0:
-                            if "synonym" not in info:
-                                info["synonym_map"] = {item[0]: item[1]}
-                            else:
-                                info["synonym_map"].update({item[0]: item[1]})
-
-                    # with open(OUT_FILE, "w") as o:
+                    output_dict = self._prepare_output(entity)
+                    for k in [
+                        key for key in output_dict.keys() if key in ["alias_map", "synonym_map"]
+                    ]:
+                        info[k] = output_dict[k]
+                    self.write_output(output_dict, fieldnames)
 
                     yield TextAnnotation(
                         subject_text_id=entity.ent_id_,
@@ -192,6 +224,19 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         info=info,
                     )
         else:
+            fieldnames = [
+                "subject_id",
+                "subject_label",
+                "start",
+                "end",
+                "confidence",
+                "sentence",
+                "concept_id",
+                "aliases",
+                "canonical_name",
+                "definition",
+                "types",
+            ]
             for entities in doc.ents:
                 for entity in entities.ents:
                     for id, confidence in entity._.kb_ents:
@@ -209,6 +254,17 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                             text = entities.text + " [" + str(abrv._.long_form) + "]"
                         else:
                             text = entities.text
+                        output_dict = {
+                            "subject_id": id,
+                            "subject_label": text,
+                            "start": entities.start_char,
+                            "end": entities.end_char,
+                            "sentence": entity.sent,
+                            "confidence": confidence,
+                        }
+                        output_dict.update(linker_dict)
+                        self.write_output(output_dict, fieldnames)
+
                         yield TextAnnotation(
                             subject_text_id=id,
                             subject_label=text,
@@ -271,21 +327,6 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
     def _add_patterns(self):
         if not self.patterns_path.is_file():
-            # # Terms dictionary
-            # self.terms = {
-            #     str(self.oi.label(curie)).lower(): {
-            #         "object_id": curie,
-            #         "object_label": self.oi.label(curie),
-            #         "alias_map": self.oi.alias_map_by_curie(curie),
-            #         "synonym_map": self.oi.synonym_map_for_curies(curie),
-            #     }
-            #     for curie in self.oi.entities(owl_type="owl:Class")
-            #     if self.oi.label(curie)
-            # }
-
-            # with open(TERMS_PATH, "wb") as t:
-            #     pickle.dump(self.terms, t)
-
             # EntityRuler
             # source: https://spacy.io/usage/rule-based-matching#entityruler-usage
             self.list_of_pattern_dicts = []
@@ -323,5 +364,15 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             self.nlp.to_disk(PIPELINE)
 
         else:
-            # self.terms = pickle.load(open(TERMS_PATH, "rb"))
             ruler = self.nlp.add_pipe("entity_ruler", before="ner").from_disk(self.patterns_path)
+
+    def write_output(self, output_dict: dict, fieldnames: list[str]):
+        if (self.outfile).is_file():
+            with open(self.outfile, "a", newline="") as o:
+                writer = csv.DictWriter(o, delimiter="\t", fieldnames=fieldnames)
+                writer.writerow(output_dict)
+        else:
+            with open(self.outfile, "w", newline="") as o:
+                writer = csv.DictWriter(o, delimiter="\t", fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerow(output_dict)
