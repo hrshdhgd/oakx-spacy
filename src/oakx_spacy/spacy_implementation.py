@@ -142,8 +142,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         """
         info = {}
         output_dict = {
-            "subject_id": entity.ent_id_,
-            "subject_label": entity.label_,
+            "object_id": entity.ent_id_,
+            "object_label": entity.label_,
             "start": entity.start_char,
             "end": entity.end_char,
             "sentence": entity.sent,
@@ -200,8 +200,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         doc = self.nlp(self._clean_string_and_lemma(text))
         fieldnames = [
-            "subject_id",
-            "subject_label",
+            "object_id",
+            "object_label",
             "start",
             "end",
             "sentence",
@@ -221,17 +221,16 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                     self.write_output(output_dict, fieldnames)
 
                     yield TextAnnotation(
-                        subject_text_id=entity.ent_id_,
-                        subject_label=entity.label_,
+                        object_id=entity.ent_id_,
+                        object_label=entity.label_,
                         subject_start=entity.start_char,
                         subject_end=entity.end_char,
-                        subject_source=entity.sent,
                         info=info,
                     )
         else:
             fieldnames = [
-                "subject_id",
-                "subject_label",
+                "object_id",
+                "object_label",
                 "start",
                 "end",
                 "confidence",
@@ -260,8 +259,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         else:
                             text = entities.text
                         output_dict = {
-                            "subject_id": id,
-                            "subject_label": text,
+                            "object_id": id,
+                            "object_label": text,
                             "start": entities.start_char,
                             "end": entities.end_char,
                             "sentence": entity.sent,
@@ -271,12 +270,11 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         self.write_output(output_dict, fieldnames)
 
                         yield TextAnnotation(
-                            subject_text_id=id,
-                            subject_label=text,
+                            object_id=id,
+                            object_label=text,
                             subject_start=entities.start_char,
                             subject_end=entities.end_char,
                             confidence=confidence,
-                            subject_source=entity.sent,
                             info=linker_dict,
                         )
 
