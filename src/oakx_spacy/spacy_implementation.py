@@ -135,6 +135,11 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         # return " ".join([token.lemma_ for token in self.nlp(tmp_str.replace('-'," "))])
 
     def _prepare_output(self, entity: Span) -> dict:
+        """Prepare outpu doctionary for exporting.
+
+        :param entity: Spacy's span object.
+        :return: Dictionary containing output column information.
+        """
         info = {}
         output_dict = {
             "subject_id": entity.ent_id_,
@@ -276,6 +281,11 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         )
 
     def _setup_nlp_pipeline(self, configuration: TextAnnotationConfiguration) -> None:
+        """Generate NLP pipeline configuration based on slug chosen.
+
+        :param configuration: Text annotation configuration from oaklib.
+        :raises ValueError: If the configuration model is incorrect.
+        """
         if hasattr(configuration, "model") and configuration.model is not None:
             self.model = configuration.model
             if configuration.model in MODELS:
@@ -309,6 +319,13 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             self.linker = self.nlp.get_pipe("scispacy_linker")
 
     def _get_pattern_list(self, phrase, raw_phrase, curie) -> List[dict]:
+        """Get the list of patterns for a given phrase.
+
+        :param phrase: Phrase in question within the raw_phrase.
+        :param raw_phrase: Raw phrase to be matched.
+        :param curie: CURIE to be matched.
+        :return: List of patterns.
+        """
         split_tokens = phrase.split()
 
         token_dict = {
@@ -326,9 +343,12 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         return [token_dict, phrase_dict]
 
     def _add_patterns(self):
+        """Generate a list of patterns which will form the dictionary for NER.
+
+        This uses the Entitylinker pipeline from Spacy.
+        source: https://spacy.io/usage/rule-based-matching#entityruler-usage
+        """
         if not self.patterns_path.is_file():
-            # EntityRuler
-            # source: https://spacy.io/usage/rule-based-matching#entityruler-usage
             self.list_of_pattern_dicts = []
             for curie in self.oi.entities(owl_type="owl:Class"):
                 # Split phrases into individual tokens
@@ -367,6 +387,11 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             ruler = self.nlp.add_pipe("entity_ruler", before="ner").from_disk(self.patterns_path)
 
     def write_output(self, output_dict: dict, fieldnames: list[str]):
+        """Generate dictionary representation of the output which is exported as TSV.
+
+        :param output_dict: Dictionary to be exported.
+        :param fieldnames: column names.
+        """
         if (self.outfile).is_file():
             with open(self.outfile, "a", newline="") as o:
                 writer = csv.DictWriter(o, delimiter="\t", fieldnames=fieldnames)
