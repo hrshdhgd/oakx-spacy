@@ -10,6 +10,7 @@ Welcome to oakx-spacy's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   static/intro.md
    modules
 
 Indices and tables
