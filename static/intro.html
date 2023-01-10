@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>oakx-spacy &mdash; oakx-spacy 0.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="oakx_spacy" href="../modules.html" />
+    <link rel="prev" title="Welcome to oakx-spacy’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> oakx-spacy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">oakx-spacy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#non-developers">Non-developers:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#spacy-models">Spacy models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scispacy-models">SciSpacy models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scispacy-linkers">SciSpacy linkers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#developers">Developers:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#install-poetry">Install <code class="docutils literal notranslate"><span class="pre">poetry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">SciSpacy models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#install-dependencies">Install dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Spacy models</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-works">How it works</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-an-ontology">Using an ontology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-scispacy">Using SciSpacy.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">oakx_spacy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">oakx-spacy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">oakx-spacy</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/static/intro.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="oakx-spacy">
+<h1>oakx-spacy<a class="headerlink" href="#oakx-spacy" title="Permalink to this heading"></a></h1>
+<p><a class="reference external" href="https://spacy.io">Spacy</a> + <a class="reference external" href="https://scispacy.apps.allenai.org">SciSpacy</a> plugin for OAK.</p>
+<p><strong>ALPHA</strong></p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<section id="non-developers">
+<h3>Non-developers:<a class="headerlink" href="#non-developers" title="Permalink to this heading"></a></h3>
+<p>Create a preferred virtual environment (<code class="docutils literal notranslate"><span class="pre">conda</span></code>, <code class="docutils literal notranslate"><span class="pre">poetry</span></code>, <code class="docutils literal notranslate"><span class="pre">venv</span></code> etc.). Install <code class="docutils literal notranslate"><span class="pre">oakx-spacy</span></code> using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">oakx</span><span class="o">-</span><span class="n">spacy</span>
+</pre></div>
+</div>
+<p>Next, desired models (Spacy and/or SciSpacy) need to be downloaded/installed. Following is the list of models available.</p>
+<section id="spacy-models">
+<h4>Spacy models<a class="headerlink" href="#spacy-models" title="Permalink to this heading"></a></h4>
+<p>English pipelines optimized for CPU.
+In order to install any of the below run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">spacy</span> <span class="pre">download</span> <span class="pre">en_core_web_xxx</span></code></p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_web_sm</span></code>: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_web_md</span></code>: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_web_lg</span></code>: Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_web_trf</span></code>: Components: transformer, tagger, parser, ner, attribute_ruler, lemmatizer.</p></li>
+</ol>
+</section>
+<section id="scispacy-models">
+<h4>SciSpacy models<a class="headerlink" href="#scispacy-models" title="Permalink to this heading"></a></h4>
+<p>In order to install any of the below use the corresponding line in <a class="reference external" href="https://github.com/hrshdhgd/oakx-spacy/blob/main/pyproject.toml#L35-L65"><code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></a></p>
+<p>For example, if <a class="reference external" href="https://github.com/UCDenver-ccp/CRAFT">CRAFT corpus</a> trained model is desired, do the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">s3</span><span class="o">-</span><span class="n">us</span><span class="o">-</span><span class="n">west</span><span class="o">-</span><span class="mf">2.</span><span class="n">amazonaws</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ai2</span><span class="o">-</span><span class="n">s2</span><span class="o">-</span><span class="n">scispacy</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">v0</span><span class="mf">.5.1</span><span class="o">/</span><span class="n">en_ner_craft_md</span><span class="o">-</span><span class="mf">0.5.1</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+<p>Available models:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">en_ner_craft_md</span></code>: A spaCy NER model trained on the CRAFT corpus.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_ner_jnlpba_md</span></code>: A spaCy NER model trained on the JNLPBA corpus.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_ner_bc5cdr_md</span></code>: A spaCy NER model trained on the BC5CDR corpus.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_ner_bionlp13cg_md</span></code>: A spaCy NER model trained on the BIONLP13CG corpus.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_sci_scibert</span></code>: A full spaCy pipeline for biomedical data with a ~785k vocabulary and allenai/scibert-base as the transformer model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_sci_sm</span></code>: A full spaCy pipeline for biomedical data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_sci_md</span></code>: A full spaCy pipeline for biomedical data with a larger vocabulary and 50k word vectors.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_core_sci_lg</span></code>: A full spaCy pipeline for biomedical data with a larger vocabulary and 600k word vectors.</p></li>
+</ol>
+</section>
+<section id="scispacy-linkers">
+<h4>SciSpacy linkers<a class="headerlink" href="#scispacy-linkers" title="Permalink to this heading"></a></h4>
+<p>These come preinstalled with <code class="docutils literal notranslate"><span class="pre">scispacy</span></code> package itself. Available linkers are:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">umls</span></code>: Links to the Unified Medical Language System, levels 0,1,2 and 9. This has ~3M concepts.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mesh</span></code>: Links to the Medical Subject Headings. This contains a smaller set of higher quality entities, which are used for indexing in Pubmed. MeSH contains ~30k entities. NOTE: The MeSH KB is derived directly from MeSH itself, and as such uses different unique identifiers than the other KBs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rxnorm</span></code>: Links to the RxNorm ontology. RxNorm contains ~100k concepts focused on normalized names for clinical drugs. It is comprised of several other drug vocabularies commonly used in pharmacy management and drug interaction, including First Databank, Micromedex, and the Gold Standard Drug Database.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">go</span></code>: Links to the Gene Ontology. The Gene Ontology contains ~67k concepts focused on the functions of genes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hpo</span></code>: Links to the Human Phenotype Ontology. The Human Phenotype Ontology contains 16k concepts focused on phenotypic abnormalities encountered in human disease.</p></li>
+</ol>
+</section>
+</section>
+<section id="developers">
+<h3>Developers:<a class="headerlink" href="#developers" title="Permalink to this heading"></a></h3>
+<section id="clone-the-repository">
+<h4>Clone the repository<a class="headerlink" href="#clone-the-repository" title="Permalink to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">hrshdhgd</span><span class="o">/</span><span class="n">oakx</span><span class="o">-</span><span class="n">spacy</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</section>
+<section id="install-poetry">
+<h4>Install <code class="docutils literal notranslate"><span class="pre">poetry</span></code><a class="headerlink" href="#install-poetry" title="Permalink to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">poetry</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h4>SciSpacy models<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<p>In <a class="reference external" href="https://github.com/hrshdhgd/oakx-spacy/blob/main/pyproject.toml#L35-L65"><code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></a>, uncomment the 2 lines corresponding to the models desired. For example, if the desired model is the CRAFT corpus, uncomment the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">tool</span><span class="o">.</span><span class="n">poetry</span><span class="o">.</span><span class="n">dependencies</span><span class="o">.</span><span class="n">en_ner_craft_md</span><span class="p">]</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="install-dependencies">
+<h4>Install dependencies<a class="headerlink" href="#install-dependencies" title="Permalink to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">install</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h4>Spacy models<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
+<p>Instructions similar to non-developers. Just make sure to prepend the command by <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">run</span></code></p>
+<p>The default model is set to <code class="docutils literal notranslate"><span class="pre">en_ner_craft_md</span></code> and default linker to <code class="docutils literal notranslate"><span class="pre">umls</span></code>.</p>
+</section>
+</section>
+</section>
+<section id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this heading"></a></h2>
+<section id="using-an-ontology">
+<h3>Using an ontology<a class="headerlink" href="#using-an-ontology" title="Permalink to this heading"></a></h3>
+<p>The input argument can be expressed as <code class="docutils literal notranslate"><span class="pre">spacy:sqlite:obo:name-of-ontology</span></code> e.g. <code class="docutils literal notranslate"><span class="pre">spacy:sqlite:obo:bero</span></code>.</p>
+<ol class="arabic simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file [<code class="docutils literal notranslate"><span class="pre">runoak</span> <span class="pre">-i</span> <span class="pre">spacy:sqlite:obo:bero</span> <span class="pre">annotate</span> <span class="pre">--text-file</span> <span class="pre">tests/input/text.txt</span></code>]</p></li>
+<li><p>Words that need to be annotated.[<code class="docutils literal notranslate"><span class="pre">runoak</span> <span class="pre">-i</span> <span class="pre">spacy:sqlite:obo:bero</span> <span class="pre">annotate</span> <span class="pre">Myeloid</span> <span class="pre">derived</span> <span class="pre">suppressor</span> <span class="pre">cells</span> <span class="pre">\(MDSC\)</span> <span class="pre">are</span> <span class="pre">immature</span> <span class="pre">myeloid</span> <span class="pre">cells</span> <span class="pre">with</span> <span class="pre">immunosuppressive</span> <span class="pre">activity.</span></code>] should yield:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">info</span><span class="p">:</span> <span class="s1">&#39;JsonObj(alias_map=JsonObj(**{&#39;&#39;rdfs:label&#39;&#39;: [&#39;&#39;Myeloid-Derived Suppressor</span>
+  <span class="n">Cell</span><span class="s1">&#39;&#39;</span><span class="p">]}))</span><span class="s1">&#39;</span>
+<span class="n">subject_end</span><span class="p">:</span> <span class="mi">30</span>
+<span class="n">subject_label</span><span class="p">:</span> <span class="n">Myeloid</span><span class="o">-</span><span class="n">Derived</span> <span class="n">Suppressor</span> <span class="n">Cell</span>
+<span class="n">subject_source</span><span class="p">:</span> <span class="n">myeloid</span> <span class="n">derive</span> <span class="n">suppressor</span> <span class="n">cell</span> <span class="p">(</span> <span class="n">mdsc</span> <span class="p">)</span> <span class="n">be</span> <span class="n">immature</span> <span class="n">myeloid</span> <span class="n">cell</span> <span class="k">with</span>
+  <span class="n">immunosuppressive</span> <span class="n">activity</span> <span class="o">.</span>
+<span class="n">subject_start</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">subject_text_id</span><span class="p">:</span> <span class="n">NCIT</span><span class="p">:</span><span class="n">C129908</span>
+
+<span class="o">---</span>
+<span class="n">info</span><span class="p">:</span> <span class="s1">&#39;JsonObj(alias_map=JsonObj(**{&#39;&#39;rdfs:label&#39;&#39;: [&#39;&#39;Immature Myeloid Cell&#39;&#39;]}))&#39;</span>
+<span class="n">subject_end</span><span class="p">:</span> <span class="mi">64</span>
+<span class="n">subject_label</span><span class="p">:</span> <span class="n">Immature</span> <span class="n">Myeloid</span> <span class="n">Cell</span>
+<span class="n">subject_source</span><span class="p">:</span> <span class="n">myeloid</span> <span class="n">derive</span> <span class="n">suppressor</span> <span class="n">cell</span> <span class="p">(</span> <span class="n">mdsc</span> <span class="p">)</span> <span class="n">be</span> <span class="n">immature</span> <span class="n">myeloid</span> <span class="n">cell</span> <span class="k">with</span>
+  <span class="n">immunosuppressive</span> <span class="n">activity</span> <span class="o">.</span>
+<span class="n">subject_start</span><span class="p">:</span> <span class="mi">43</span>
+<span class="n">subject_text_id</span><span class="p">:</span> <span class="n">NCIT</span><span class="p">:</span><span class="n">C113503</span>
+</pre></div>
+</div>
+</section>
+<section id="using-scispacy">
+<h3>Using SciSpacy.<a class="headerlink" href="#using-scispacy" title="Permalink to this heading"></a></h3>
+<p>The input argument can be expressed as <code class="docutils literal notranslate"><span class="pre">spacy:linker-name</span></code> e.g. <code class="docutils literal notranslate"><span class="pre">spacy:mesh</span></code>.
+There are two possible inputs to this plugin:</p>
+<ol class="arabic simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file [<code class="docutils literal notranslate"><span class="pre">runoak</span> <span class="pre">-i</span> <span class="pre">spacy:</span> <span class="pre">annotate</span> <span class="pre">--text-file</span> <span class="pre">text.txt</span></code>]</p></li>
+<li><p>Words that need to be annotated.[<code class="docutils literal notranslate"><span class="pre">runoak</span> <span class="pre">-i</span> <span class="pre">spacy:</span> <span class="pre">annotate</span> <span class="pre">Myeloid</span> <span class="pre">derived</span> <span class="pre">suppressor</span> <span class="pre">cells</span> <span class="pre">\(MDSC\)</span> <span class="pre">are</span> <span class="pre">immature</span> <span class="pre">myeloid</span> <span class="pre">cells</span> <span class="pre">with</span> <span class="pre">immunosuppressive</span> <span class="pre">activity.</span></code>] should yield (shortened):</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">confidence</span><span class="p">:</span> <span class="mf">0.9999999403953552</span>
+<span class="n">info</span><span class="p">:</span> <span class="n">JsonObj</span><span class="p">(</span><span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;t cell suppressor&#39;</span><span class="p">,</span> <span class="s1">&#39;suppressor cell&#39;</span><span class="p">,</span> <span class="s1">&#39;T suppressor cell&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;suppressor cells&#39;</span><span class="p">,</span> <span class="s1">&#39;Suppressor cell&#39;</span><span class="p">,</span> <span class="s1">&#39;suppressor T lymphocyte&#39;</span><span class="p">,</span> <span class="s1">&#39;cells suppressor</span>
+  <span class="n">t</span><span class="s1">&#39;, &#39;</span><span class="n">Suppressor</span> <span class="n">cells</span><span class="s1">&#39;, &#39;</span><span class="n">Suppressor</span> <span class="n">cell</span> <span class="p">(</span><span class="n">cell</span><span class="p">)</span><span class="s1">&#39;], canonical_name=&#39;</span><span class="n">Suppressor</span> <span class="n">T</span>
+  <span class="n">Lymphocyte</span><span class="s1">&#39;, concept_id=&#39;</span><span class="n">C0038856</span><span class="s1">&#39;, definition=&#39;</span><span class="n">subpopulation</span> <span class="n">of</span> <span class="n">CD8</span><span class="o">+</span> <span class="n">T</span><span class="o">-</span><span class="n">lymphocytes</span>
+  <span class="n">which</span> <span class="n">suppress</span> <span class="n">antibody</span> <span class="n">production</span> <span class="ow">or</span> <span class="n">inhibit</span> <span class="n">cellular</span> <span class="n">immune</span> <span class="n">responses</span><span class="o">.</span><span class="s1">&#39;, types=[&#39;</span><span class="n">T025</span><span class="s1">&#39;])</span>
+<span class="n">subject_end</span><span class="p">:</span> <span class="mi">30</span>
+<span class="n">subject_label</span><span class="p">:</span> <span class="n">suppressor</span> <span class="n">cell</span>
+<span class="n">subject_source</span><span class="p">:</span> <span class="n">myeloid</span> <span class="n">derive</span> <span class="n">suppressor</span> <span class="n">cell</span> <span class="p">(</span> <span class="n">mdsc</span> <span class="p">)</span> <span class="n">be</span> <span class="n">immature</span> <span class="n">myeloid</span> <span class="n">cell</span> <span class="k">with</span>
+  <span class="n">immunosuppressive</span> <span class="n">activity</span> <span class="o">.</span>
+<span class="n">subject_start</span><span class="p">:</span> <span class="mi">15</span>
+<span class="n">subject_text_id</span><span class="p">:</span> <span class="n">C0038856</span>
+
+<span class="o">---</span>
+
+<span class="o">...</span>
+
+<span class="o">---</span>
+<span class="n">confidence</span><span class="p">:</span> <span class="mf">0.8391554355621338</span>
+<span class="n">info</span><span class="p">:</span> <span class="n">JsonObj</span><span class="p">(</span><span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Myeloid Cell Leukemia Sequence 1&#39;</span><span class="p">,</span> <span class="s1">&#39;Myeloid Cell Leukemia</span>
+  <span class="n">Sequence</span> <span class="mi">1</span> <span class="n">Protein</span><span class="s1">&#39;, &#39;</span><span class="n">Induced</span> <span class="n">Myeloid</span> <span class="n">Leukemia</span> <span class="n">Cell</span> <span class="n">Differentiation</span> <span class="n">Protein</span> <span class="n">Mcl</span><span class="o">-</span><span class="mi">1</span><span class="s1">&#39;,</span>
+  <span class="s1">&#39;Myeloid Cell Factor-1&#39;</span><span class="p">,</span> <span class="s1">&#39;Myeloid Cell Factor 1&#39;</span><span class="p">,</span> <span class="s1">&#39;Induced Myeloid Leukemia Cell</span>
+  <span class="n">Differentiation</span> <span class="n">Protein</span> <span class="n">Mcl</span> <span class="mi">1</span><span class="s1">&#39;, &#39;</span><span class="n">Factor</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">Myeloid</span> <span class="n">Cell</span><span class="s1">&#39;, &#39;</span><span class="n">Cell</span> <span class="n">Factor</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">Myeloid</span><span class="s1">&#39;],</span>
+  <span class="n">canonical_name</span><span class="o">=</span><span class="s1">&#39;Myeloid Cell Leukemia Sequence 1 Protein&#39;</span><span class="p">,</span> <span class="n">concept_id</span><span class="o">=</span><span class="s1">&#39;C1510444&#39;</span><span class="p">,</span>
+  <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;A member of the myeloid leukemia factor (MLF) protein family with multiple</span>
+  <span class="n">alternatively</span> <span class="n">spliced</span> <span class="n">transcript</span> <span class="n">variants</span> <span class="n">encoding</span> <span class="n">different</span> <span class="n">protein</span> <span class="n">isoforms</span><span class="o">.</span> <span class="n">In</span>
+  <span class="n">hematopoietic</span> <span class="n">cells</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">located</span> <span class="n">mainly</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">nucleus</span><span class="p">,</span> <span class="ow">and</span> <span class="ow">in</span> <span class="n">non</span><span class="o">-</span><span class="n">hematopoietic</span>
+  <span class="n">cells</span><span class="p">,</span> <span class="n">primarily</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">cytoplasm</span> <span class="k">with</span> <span class="n">a</span> <span class="n">punctate</span> <span class="n">nuclear</span> <span class="n">localization</span><span class="o">.</span> <span class="n">MLF1</span> <span class="n">plays</span>
+  <span class="n">a</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">cell</span> <span class="n">cycle</span> <span class="n">differentiation</span><span class="o">.</span><span class="s1">&#39;, types=[&#39;</span><span class="n">T116</span><span class="s1">&#39;, &#39;</span><span class="n">T123</span><span class="s1">&#39;])</span>
+<span class="n">subject_end</span><span class="p">:</span> <span class="mi">64</span>
+<span class="n">subject_label</span><span class="p">:</span> <span class="n">myeloid</span> <span class="n">cell</span>
+<span class="n">subject_source</span><span class="p">:</span> <span class="n">myeloid</span> <span class="n">derive</span> <span class="n">suppressor</span> <span class="n">cell</span> <span class="p">(</span> <span class="n">mdsc</span> <span class="p">)</span> <span class="n">be</span> <span class="n">immature</span> <span class="n">myeloid</span> <span class="n">cell</span> <span class="k">with</span>
+  <span class="n">immunosuppressive</span> <span class="n">activity</span> <span class="o">.</span>
+<span class="n">subject_start</span><span class="p">:</span> <span class="mi">52</span>
+<span class="n">subject_text_id</span><span class="p">:</span> <span class="n">C1510444</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="acknowledgements">
+<h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this heading"></a></h1>
+<p>This <a class="reference external" href="https://cookiecutter.readthedocs.io/en/stable/README.html">cookiecutter</a> project was developed from the <a class="reference external" href="https://github.com/INCATools/oakx-plugin-cookiecutter">oakx-plugin-cookiecutter</a> template and will be kept up-to-date using <a class="reference external" href="https://cruft.github.io/cruft/">cruft</a>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to oakx-spacy’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../modules.html" class="btn btn-neutral float-right" title="oakx_spacy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright f&#34;{date.today().year}, Harshad Hegde &lt;hhegde@lbl.gov&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
