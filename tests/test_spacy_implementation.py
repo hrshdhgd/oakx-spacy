@@ -28,10 +28,10 @@ class TestSpacyImplementation(unittest.TestCase):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_file, self.config))
         self.assertEqual(len(results), 15)
-        self.assertTrue("C0439106" in [x.subject_text_id for x in results])
+        self.assertTrue("C0439106" in [x.object_id for x in results])
 
     def test_annotate_text(self):
         """Test annotation of text."""
         results = list(self.impl.annotate_text(self.input_words, self.config))
         self.assertEqual(len(results), 10)
-        self.assertTrue("C1510444" in [x.subject_text_id for x in results])
+        self.assertTrue("C1510444" in [x.object_id for x in results])
