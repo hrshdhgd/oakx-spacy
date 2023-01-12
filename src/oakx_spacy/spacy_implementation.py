@@ -184,6 +184,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         """
         if isinstance(text_file, TextIOWrapper):
             for line in text_file.readlines():  # type: ignore
+                if text_file.name.endswith(".tsv"):
+                    line = line.strip().split("\t")
                 yield from self.annotate_text(line, configuration)
         else:
             if text_file.suffix == ".txt":
