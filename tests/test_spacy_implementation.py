@@ -10,6 +10,7 @@ from oaklib.selector import get_implementation_from_shorthand
 for name, _ in os.environ.items():
     if "GITHUB" in name:
         CI_FLAG = False
+        break
     else:
         CI_FLAG = True
 
