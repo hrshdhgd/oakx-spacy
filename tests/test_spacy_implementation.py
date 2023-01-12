@@ -1,9 +1,12 @@
 """Spacy Implementation test."""
+import os
 import unittest
 from pathlib import Path
 
 from oaklib.datamodels.text_annotator import TextAnnotationConfiguration
 from oaklib.selector import get_implementation_from_shorthand
+
+GITHUB_ENV_FILE = os.getenv("GITHUB_ENV")
 
 
 class TestSpacyImplementation(unittest.TestCase):
@@ -28,9 +31,8 @@ class TestSpacyImplementation(unittest.TestCase):
 
     # !FIXME:
     # @unittest.skip("NEED A VALID CONDITION LIKE ABOVE TO WORK")
-    import os
     @unittest.skipIf(
-        os.getenv("GITHUB_ENV"),
+        GITHUB_ENV_FILE is not None,
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file_txt(self):
@@ -40,7 +42,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertTrue("C1323350" in [x.object_id for x in results])
 
     @unittest.skipIf(
-        os.getenv("GITHUB_ENV"),
+        GITHUB_ENV_FILE is not None,
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file_tsv(self):
