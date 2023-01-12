@@ -99,7 +99,7 @@ DEFAULT_LINKER = "umls"
 # ! CLI command:
 #   runoak -i spacy: annotate --text-file tests/input/text.txt --model en_ner_craft_md
 #   OR
-#   runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt
+#   runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt -x exclude.txt
 
 
 @dataclass
@@ -128,6 +128,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         self.stopwords = STOPWORDS_PATH.read_text().splitlines()
         if (self.outfile).is_file():
             self.outfile.unlink()
+        self.tsv_input = False
+        self.text_id = None
 
     def _clean_string_and_lemma(self, string):
         return " ".join([token.lemma_ for token in self.nlp(string)])
@@ -146,8 +148,12 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             "object_label": entity.label_,
             "start": entity.start_char,
             "end": entity.end_char,
-            "sentence": entity.sent,
+            "confidence": 0.80,
         }
+
+        if self.tsv_input:
+            output_dict["text_id"] = self.text_id
+
         for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
             if len(item) > 0:
                 if "alias" not in info:
@@ -178,10 +184,23 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         """
         if isinstance(text_file, TextIOWrapper):
             for line in text_file.readlines():  # type: ignore
+                if text_file.name.endswith(".tsv"):
+                    line = line.strip().split("\t")
                 yield from self.annotate_text(line, configuration)
         else:
-            for line in text_file.read_text():  # type: ignore
-                yield from self.annotate_text(line, configuration)
+            if text_file.suffix == ".txt":
+                with open(text_file, "r") as f:
+                    for line in f.readlines():  # type: ignore
+                        yield from self.annotate_text(line, configuration)
+            elif text_file.suffix == ".tsv":
+                with open(text_file, "r") as f:
+                    for line in csv.reader(f, delimiter="\t"):  # type: ignore
+                        yield from self.annotate_text(line, configuration)
+            else:
+                raise ValueError(
+                    f"Incompatible input file type: {text_file.suffix}.\
+                        Use only .txt or .tsv files."
+                )
 
     def annotate_text(
         self, text: str, configuration: TextAnnotationConfiguration
@@ -198,85 +217,89 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if not hasattr(self, "nlp"):
             self._setup_nlp_pipeline(configuration)
 
-        doc = self.nlp(self._clean_string_and_lemma(text))
-        fieldnames = [
-            "object_id",
-            "object_label",
-            "start",
-            "end",
-            "sentence",
-            "alias_map",
-            "synonym_map",
-        ]
+        if isinstance(text, list):
+            # It is a TSV file
+            self.text_id, text = text
+            self.tsv_input = True
 
-        if hasattr(self, "oi"):
-            for entity in doc.ents:
-                if entity.ent_id_ and entity.text not in self.stopwords:
-                    info = {}
-                    output_dict = self._prepare_output(entity)
-                    for k in [
-                        key for key in output_dict.keys() if key in ["alias_map", "synonym_map"]
-                    ]:
-                        info[k] = output_dict[k]
-                    self.write_output(output_dict, fieldnames)
-
-                    yield TextAnnotation(
-                        object_id=entity.ent_id_,
-                        object_label=entity.label_,
-                        subject_start=entity.start_char,
-                        subject_end=entity.end_char,
-                        info=info,
-                    )
-        else:
+        if text != "text":
+            doc = self.nlp(self._clean_string_and_lemma(text))
             fieldnames = [
                 "object_id",
                 "object_label",
                 "start",
                 "end",
+                "alias_map",
+                "synonym_map",
                 "confidence",
-                "sentence",
-                "concept_id",
-                "aliases",
-                "canonical_name",
-                "definition",
-                "types",
             ]
-            for entities in doc.ents:
-                for entity in entities.ents:
-                    for id, confidence in entity._.kb_ents:
-                        linker_object = self.linker.kb.cui_to_entity[id]
-                        keys = [
-                            item
-                            for item in dir(linker_object)
-                            if not item.startswith("_") and item not in ["count", "index"]
-                        ]
-                        linker_dict = {k: linker_object.__getattribute__(k) for k in keys}
-                        if str(entity) in str(doc._.abbreviations):
-                            abrv = [
-                                item for item in doc._.abbreviations if str(item) == str(entity)
-                            ][0]
-                            text = entities.text + " [" + str(abrv._.long_form) + "]"
-                        else:
-                            text = entities.text
-                        output_dict = {
-                            "object_id": id,
-                            "object_label": text,
-                            "start": entities.start_char,
-                            "end": entities.end_char,
-                            "sentence": entity.sent,
-                            "confidence": confidence,
-                        }
-                        output_dict.update(linker_dict)
-                        self.write_output(output_dict, fieldnames)
+            if self.tsv_input and "text_id" not in fieldnames:
+                fieldnames.insert(0, "text_id")
 
-                        yield TextAnnotation(
-                            object_id=id,
-                            object_label=text,
-                            subject_start=entities.start_char,
-                            subject_end=entities.end_char,
-                            confidence=confidence,
-                            info=linker_dict,
-                        )
+            if hasattr(self, "oi"):
+                for entity in doc.ents:
+                    if entity.ent_id_ and entity.text not in self.stopwords:
+                        info = {}
+                        output_dict = self._prepare_output(entity)
+                        for k in [
+                            key for key in output_dict.keys() if key in ["alias_map", "synonym_map"]
+                        ]:
+                            info[k] = output_dict[k]
+                        yield from self.write_output(output_dict, fieldnames, info)
+
+                        # yield TextAnnotation(
+                        #     object_id=entity.ent_id_,
+                        #     object_label=entity.label_,
+                        #     subject_start=entity.start_char,
+                        #     subject_end=entity.end_char,
+                        #     info=info,
+                        # )
+            else:
+                fieldnames = [
+                    "object_id",
+                    "object_label",
+                    "start",
+                    "end",
+                    "confidence",
+                    "concept_id",
+                    "aliases",
+                    "canonical_name",
+                    "definition",
+                    "types",
+                ]
+
+                for entities in doc.ents:
+                    for entity in entities.ents:
+                        for id, confidence in entity._.kb_ents:
+                            linker_object = self.linker.kb.cui_to_entity[id]
+                            keys = [
+                                item
+                                for item in dir(linker_object)
+                                if not item.startswith("_") and item not in ["count", "index"]
+                            ]
+                            linker_dict = {k: linker_object.__getattribute__(k) for k in keys}
+                            if str(entity) in str(doc._.abbreviations):
+                                abrv = [
+                                    item for item in doc._.abbreviations if str(item) == str(entity)
+                                ][0]
+                                text = entities.text + " [" + str(abrv._.long_form) + "]"
+                            else:
+                                text = entities.text
+                            output_dict = {
+                                "object_id": id,
+                                "object_label": text,
+                                "start": entities.start_char,
+                                "end": entities.end_char,
+                                "confidence": confidence,
+                            }
+
+                            output_dict.update(linker_dict)
+                            if self.tsv_input:
+                                if "text_id" not in fieldnames:
+                                    fieldnames.insert(0, "text_id")
+                                output_dict["text_id"] = self.text_id
+
+                            yield from self.write_output(output_dict, fieldnames, linker_dict)
 
     def _setup_nlp_pipeline(self, configuration: TextAnnotationConfiguration) -> None:
         """Generate NLP pipeline configuration based on slug chosen.
@@ -384,11 +407,12 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         else:
             ruler = self.nlp.add_pipe("entity_ruler", before="ner").from_disk(self.patterns_path)
 
-    def write_output(self, output_dict: dict, fieldnames: list[str]):
+    def write_output(self, output_dict: dict, fieldnames: list[str], info: dict):
         """Generate dictionary representation of the output which is exported as TSV.
 
         :param output_dict: Dictionary to be exported.
         :param fieldnames: column names.
+        :param info: Dictionary containing extra information.
         """
         if (self.outfile).is_file():
             with open(self.outfile, "a", newline="") as o:
@@ -399,3 +423,23 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 writer = csv.DictWriter(o, delimiter="\t", fieldnames=fieldnames)
                 writer.writeheader()
                 writer.writerow(output_dict)
+
+        if self.tsv_input:
+            yield TextAnnotation(
+                subject_text_id=output_dict["text_id"],
+                object_id=output_dict["object_id"],
+                object_label=output_dict["object_label"],
+                subject_start=output_dict["start"],
+                subject_end=output_dict["end"],
+                confidence=output_dict["confidence"],
+                info=info,
+            )
+        else:
+            yield TextAnnotation(
+                object_id=output_dict["object_id"],
+                object_label=output_dict["object_label"],
+                subject_start=output_dict["start"],
+                subject_end=output_dict["end"],
+                confidence=output_dict["confidence"],
+                info=info,
+            )
