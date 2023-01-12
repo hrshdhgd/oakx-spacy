@@ -13,10 +13,18 @@ class TestSpacyImplementation(unittest.TestCase):
         """Set up implementation."""
         self.impl = get_implementation_from_shorthand("spacy:")
         self.input_file = Path(__file__).resolve().parents[1] / "tests/input/text.txt"
+        self.input_tsv = Path(__file__).resolve().parents[1] / "tests/input/test.tsv"
         self.impl.output_dir = Path(__file__).resolve().parents[1] / "tests/output/"
         self.input_words = "Myeloid derived suppressor cells (MDSC) \
             are immature myeloid cells with immunosuppressive activity."
+
         self.config = TextAnnotationConfiguration()
+
+    def test_annotate_text(self):
+        """Test annotation of text."""
+        results = list(self.impl.annotate_text(self.input_words, self.config))
+        self.assertEqual(len(results), 10)
+        self.assertTrue("C1510444" in [x.object_id for x in results])
 
     # !FIXME:
     # @unittest.skipIf(
@@ -24,14 +32,14 @@ class TestSpacyImplementation(unittest.TestCase):
     #     "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     # )
     @unittest.skip("NEED A VALID CONDITION LIKE ABOVE TO WORK")
-    def test_annotate_file(self):
+    def test_annotate_file_txt(self):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_file, self.config))
-        self.assertEqual(len(results), 15)
-        self.assertTrue("C0439106" in [x.object_id for x in results])
+        self.assertEqual(len(results), 30)
+        self.assertTrue("C1323350" in [x.object_id for x in results])
 
-    def test_annotate_text(self):
-        """Test annotation of text."""
-        results = list(self.impl.annotate_text(self.input_words, self.config))
-        self.assertEqual(len(results), 10)
-        self.assertTrue("C1510444" in [x.object_id for x in results])
+    def test_annotate_file_tsv(self):
+        """Test annotation of a file."""
+        results = list(self.impl.annotate_file(self.input_tsv, self.config))
+        self.assertEqual(len(results), 15)
+        self.assertTrue("C4163697" in [x.object_id for x in results])
