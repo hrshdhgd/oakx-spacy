@@ -99,7 +99,7 @@ DEFAULT_LINKER = "umls"
 # ! CLI command:
 #   runoak -i spacy: annotate --text-file tests/input/text.txt --model en_ner_craft_md
 #   OR
-#   runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt
+#   runoak -i spacy:sqlite:obo:bero annotate --text-file tests/input/text.txt -x exclude.txt
 
 
 @dataclass
