@@ -27,17 +27,22 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertTrue("C1510444" in [x.object_id for x in results])
 
     # !FIXME:
-    # @unittest.skipIf(
-    #     os.getenv("GITHUB_ENV"),
-    #     "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
-    # )
-    @unittest.skip("NEED A VALID CONDITION LIKE ABOVE TO WORK")
+    # @unittest.skip("NEED A VALID CONDITION LIKE ABOVE TO WORK")
+    import os
+    @unittest.skipIf(
+        os.getenv("GITHUB_ENV"),
+        "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
+    )
     def test_annotate_file_txt(self):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_file, self.config))
         self.assertEqual(len(results), 30)
         self.assertTrue("C1323350" in [x.object_id for x in results])
 
+    @unittest.skipIf(
+        os.getenv("GITHUB_ENV"),
+        "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
+    )
     def test_annotate_file_tsv(self):
         """Test annotation of a file."""
         results = list(self.impl.annotate_file(self.input_tsv, self.config))
