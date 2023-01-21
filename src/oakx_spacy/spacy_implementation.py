@@ -137,15 +137,17 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         # return " ".join([token.lemma_ for token in self.nlp(tmp_str.replace('-'," "))])
 
     def _prepare_output(self, entity: Span) -> dict:
-        """Prepare outpu doctionary for exporting.
+        """Prepare output doctionary for exporting.
 
         :param entity: Spacy's span object.
         :return: Dictionary containing output column information.
         """
-        info = {}
+        
         output_dict = {
             "object_id": entity.ent_id_,
             "object_label": entity.label_,
+            "matched_term": entity.text,
+            "POS": ", ".join([token.pos_ for token in entity]),
             "start": entity.start_char,
             "end": entity.end_char,
             "confidence": 0.80,
@@ -153,22 +155,24 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         if self.tsv_input:
             output_dict["text_id"] = self.text_id
+            
+        #! TAKES TOO LONG - adding alias_map and synonym_map
+        # info = {}
+        # for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
+        #     if len(item) > 0:
+        #         if "alias" not in info:
+        #             info["alias_map"] = {item[0]: item[1]}
+        #         else:
+        #             info["alias_map"].update({item[0]: item[1]})
 
-        for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
-            if len(item) > 0:
-                if "alias" not in info:
-                    info["alias_map"] = {item[0]: item[1]}
-                else:
-                    info["alias_map"].update({item[0]: item[1]})
+        # for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
+        #     if len(item) > 0:
+        #         if "synonym" not in info:
+        #             info["synonym_map"] = {item[0]: item[1]}
+        #         else:
+        #             info["synonym_map"].update({item[0]: item[1]})
 
-        for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
-            if len(item) > 0:
-                if "synonym" not in info:
-                    info["synonym_map"] = {item[0]: item[1]}
-                else:
-                    info["synonym_map"].update({item[0]: item[1]})
-
-        output_dict.update(info)
+        # output_dict.update(info)
         return output_dict
 
     def annotate_file(
@@ -225,8 +229,10 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if text != "text":
             doc = self.nlp(self._clean_string_and_lemma(text))
             fieldnames = [
+                "matched_term",
                 "object_id",
                 "object_label",
+                "POS",
                 "start",
                 "end",
                 "alias_map",
@@ -241,10 +247,10 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                     if entity.ent_id_ and entity.text not in self.stopwords:
                         info = {}
                         output_dict = self._prepare_output(entity)
-                        for k in [
-                            key for key in output_dict.keys() if key in ["alias_map", "synonym_map"]
-                        ]:
-                            info[k] = output_dict[k]
+                        # for k in [
+                        #     key for key in output_dict.keys() if key in ["alias_map", "synonym_map"]
+                        # ]:
+                        #     info[k] = output_dict[k]
                         yield from self.write_output(output_dict, fieldnames, info)
 
                         # yield TextAnnotation(
@@ -256,6 +262,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         # )
             else:
                 fieldnames = [
+                    "matched_term",
                     "object_id",
                     "object_label",
                     "start",
