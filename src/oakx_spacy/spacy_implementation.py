@@ -142,7 +142,6 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         :param entity: Spacy's span object.
         :return: Dictionary containing output column information.
         """
-        
         output_dict = {
             "object_id": entity.ent_id_,
             "object_label": entity.label_,
@@ -155,8 +154,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         if self.tsv_input:
             output_dict["text_id"] = self.text_id
-            
-        #! TAKES TOO LONG - adding alias_map and synonym_map
+
+        # ! TAKES TOO LONG - adding alias_map and synonym_map
         # info = {}
         # for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
         #     if len(item) > 0:
@@ -248,7 +247,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         info = {}
                         output_dict = self._prepare_output(entity)
                         # for k in [
-                        #     key for key in output_dict.keys() if key in ["alias_map", "synonym_map"]
+                        #     key for key in output_dict.keys() if key in ["alias_map", "synonym_map"] # noqa
                         # ]:
                         #     info[k] = output_dict[k]
                         yield from self.write_output(output_dict, fieldnames, info)
