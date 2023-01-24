@@ -345,7 +345,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             )
             self.linker = self.nlp.get_pipe("scispacy_linker")
 
-    def _get_pattern_list(self, phrase, raw_phrase, curie) -> List[dict]:
+    def _get_pattern_list(self, phrase:str, raw_phrase:str, curie:str) -> List[dict]:
         """Get the list of patterns for a given phrase.
 
         :param phrase: Phrase in question within the raw_phrase.
@@ -354,7 +354,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         :return: List of patterns.
         """
         split_tokens = phrase.split()
-
+        
         token_dict = {
             "label": raw_phrase,
             "pattern": [{self.phrase_matcher_attr: token.lower()} for token in split_tokens],
@@ -366,8 +366,26 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
             "id": curie,
         }
+        list_of_patterns = [token_dict, phrase_dict]
+        if curie.startswith("NCBITaxon:"):
+            for tok in split_tokens:
+                list_of_patterns.append(
+                    {
+                        "label": raw_phrase,
+                        "pattern": [{self.phrase_matcher_attr: tok.lower()}],
+                        "id": curie,
+                    }
+                )
+                list_of_patterns.append(
+                    {
+                        "label": raw_phrase,
+                        "pattern": [{self.phrase_matcher_attr: tok}],
+                        "id": curie,
+                    }
+                )
 
-        return [token_dict, phrase_dict]
+
+        return list_of_patterns
 
     def _add_patterns(self):
         """Generate a list of patterns which will form the dictionary for NER.
