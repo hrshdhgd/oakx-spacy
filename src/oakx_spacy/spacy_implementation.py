@@ -345,7 +345,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             )
             self.linker = self.nlp.get_pipe("scispacy_linker")
 
-    def _get_pattern_list(self, phrase:str, raw_phrase:str, curie:str) -> List[dict]:
+    def _get_pattern_list(self, phrase: str, raw_phrase: str, curie: str) -> List[dict]:
         """Get the list of patterns for a given phrase.
 
         :param phrase: Phrase in question within the raw_phrase.
@@ -354,7 +354,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         :return: List of patterns.
         """
         split_tokens = phrase.split()
-        
+
         token_dict = {
             "label": raw_phrase,
             "pattern": [{self.phrase_matcher_attr: token.lower()} for token in split_tokens],
@@ -383,7 +383,6 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         "id": curie,
                     }
                 )
-
 
         return list_of_patterns
 
@@ -450,7 +449,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         if self.tsv_input:
             yield TextAnnotation(
-                subject_document_id=output_dict["document_id"],
+                subject_text_id=output_dict["document_id"],
                 object_id=output_dict["object_id"],
                 object_label=output_dict["object_label"],
                 subject_start=output_dict["start"],
