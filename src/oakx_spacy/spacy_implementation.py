@@ -244,7 +244,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             if hasattr(self, "oi"):
                 for entity in doc.ents:
                     if entity.ent_id_ and entity.text not in self.stopwords:
-                        info = {}
+                        info:dict = {}
                         output_dict = self._prepare_output(entity)
                         # for k in [
                         #     key for key in output_dict.keys() if key in ["alias_map", "synonym_map"] # noqa
