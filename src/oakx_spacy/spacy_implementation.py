@@ -129,7 +129,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if (self.outfile).is_file():
             self.outfile.unlink()
         self.tsv_input = False
-        self.text_id = None
+        self.document_id = None
 
     def _clean_string_and_lemma(self, string):
         return " ".join([token.lemma_ for token in self.nlp(string)])
@@ -153,7 +153,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         }
 
         if self.tsv_input:
-            output_dict["text_id"] = self.text_id
+            output_dict["document_id"] = self.document_id
 
         # ! TAKES TOO LONG - adding alias_map and synonym_map
         # info = {}
@@ -222,7 +222,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         if isinstance(text, list):
             # It is a TSV file
-            self.text_id, text = text
+            self.document_id, text = text
             self.tsv_input = True
 
         if text != "text":
@@ -238,8 +238,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 "synonym_map",
                 "confidence",
             ]
-            if self.tsv_input and "text_id" not in fieldnames:
-                fieldnames.insert(0, "text_id")
+            if self.tsv_input and "document_id" not in fieldnames:
+                fieldnames.insert(0, "document_id")
 
             if hasattr(self, "oi"):
                 for entity in doc.ents:
@@ -301,9 +301,9 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
                             output_dict.update(linker_dict)
                             if self.tsv_input:
-                                if "text_id" not in fieldnames:
-                                    fieldnames.insert(0, "text_id")
-                                output_dict["text_id"] = self.text_id
+                                if "document_id" not in fieldnames:
+                                    fieldnames.insert(0, "document_id")
+                                output_dict["document_id"] = self.document_id
 
                             yield from self.write_output(output_dict, fieldnames, linker_dict)
 
@@ -432,7 +432,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         if self.tsv_input:
             yield TextAnnotation(
-                subject_text_id=output_dict["text_id"],
+                subject_document_id=output_dict["document_id"],
                 object_id=output_dict["object_id"],
                 object_label=output_dict["object_label"],
                 subject_start=output_dict["start"],
