@@ -7,12 +7,11 @@ from oaklib.datamodels.text_annotator import TextAnnotationConfiguration
 from oaklib.selector import get_implementation_from_shorthand
 
 # Scan environment variables
+CI_FLAG = False
 for name, _ in os.environ.items():
     if "GITHUB" in name:
-        CI_FLAG = False
-        break
-    else:
         CI_FLAG = True
+        break
 
 
 class TestSpacyImplementation(unittest.TestCase):
@@ -36,7 +35,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertTrue("C1510444" in [x.object_id for x in results])
 
     @unittest.skipIf(
-        CI_FLAG is False,
+        CI_FLAG,
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file_txt(self):
@@ -46,7 +45,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertTrue("C1323350" in [x.object_id for x in results])
 
     @unittest.skipIf(
-        CI_FLAG is False,
+        CI_FLAG,
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file_tsv(self):
