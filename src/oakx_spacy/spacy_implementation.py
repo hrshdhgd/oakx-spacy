@@ -240,7 +240,6 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 fieldnames.insert(0, "document_id")
             if self.include_aliases:
                 fieldnames.insert(-1, "aliases")
-                
 
             if hasattr(self, "oi"):
                 for entity in doc.ents:
@@ -456,7 +455,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                object_aliases=output_dict["aliases"]
+                object_aliases=output_dict["aliases"],
             )
         else:
             yield TextAnnotation(
@@ -465,5 +464,5 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                object_aliases=output_dict["aliases"]
+                object_aliases=output_dict["aliases"],
             )
