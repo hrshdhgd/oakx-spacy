@@ -130,6 +130,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             self.outfile.unlink()
         self.tsv_input = False
         self.document_id = None
+        self.include_aliases = False
 
     def _clean_string_and_lemma(self, string):
         return " ".join([token.lemma_ for token in self.nlp(string)])
@@ -150,19 +151,16 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             "start": entity.start_char,
             "end": entity.end_char,
             "confidence": 0.80,
+            "aliases": [],
         }
 
         if self.tsv_input:
             output_dict["document_id"] = self.document_id
 
-        # ! TAKES TOO LONG - adding alias_map and synonym_map
-        # info = {}
-        # for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
-        #     if len(item) > 0:
-        #         if "alias" not in info:
-        #             info["alias_map"] = {item[0]: item[1]}
-        #         else:
-        #             info["alias_map"].update({item[0]: item[1]})
+        if self.include_aliases:
+            for _, item in self.oi.alias_map_by_curie(entity.ent_id_).items():
+                if len(item) > 0:
+                    output_dict["aliases"].extend(item)
 
         # for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
         #     if len(item) > 0:
@@ -220,6 +218,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if not hasattr(self, "nlp"):
             self._setup_nlp_pipeline(configuration)
 
+        self.include_aliases = configuration.include_aliases
+
         if isinstance(text, list):
             # It is a TSV file
             self.document_id, text = text
@@ -234,12 +234,13 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 "POS",
                 "start",
                 "end",
-                "alias_map",
-                "synonym_map",
                 "confidence",
             ]
             if self.tsv_input and "document_id" not in fieldnames:
                 fieldnames.insert(0, "document_id")
+            if self.include_aliases:
+                fieldnames.insert(-1, "aliases")
+                
 
             if hasattr(self, "oi"):
                 for entity in doc.ents:
@@ -455,7 +456,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                info=info,
+                object_aliases=output_dict["aliases"]
             )
         else:
             yield TextAnnotation(
@@ -464,5 +465,5 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                info=info,
+                object_aliases=output_dict["aliases"]
             )

@@ -35,8 +35,6 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertEqual(len(results), 10)
         self.assertTrue("C1510444" in [x.object_id for x in results])
 
-    # !FIXME:
-    # @unittest.skip("NEED A VALID CONDITION LIKE ABOVE TO WORK")
     @unittest.skipIf(
         CI_FLAG is not None,
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
