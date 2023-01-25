@@ -36,7 +36,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertTrue("C1510444" in [x.object_id for x in results])
 
     @unittest.skipIf(
-        CI_FLAG is not None,
+        CI_FLAG is False,
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file_txt(self):
@@ -46,7 +46,7 @@ class TestSpacyImplementation(unittest.TestCase):
         self.assertTrue("C1323350" in [x.object_id for x in results])
 
     @unittest.skipIf(
-        CI_FLAG is not None,
+        CI_FLAG is False,
         "Avoid: Got SIGTERM, handling it as a KeyboardInterrupt",
     )
     def test_annotate_file_tsv(self):
