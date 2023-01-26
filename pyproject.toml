@@ -12,7 +12,7 @@ setuptools = "^65.0.1"
 tox = "^3.25.1"
 click = "^8.1.3"
 importlib = "^1.0.4"
-oaklib = "^0.1"
+oaklib = "^0.1.69"
 sphinx = {version = "^5.3.0", extras = ["docs"]}
 sphinx-rtd-theme = {version = "^1.0.0", extras = ["docs"]}
 sphinx-autodoc-typehints = {version = "^1.19.4", extras = ["docs"]}
@@ -30,7 +30,7 @@ oxpacy = "oakx_spacy.cli:main"
 [tool.poetry.plugins."oaklib.plugins"]
 spacy = "oakx_spacy.spacy_implementation:SpacyImplementation"
 
-## SciSpacy NER models #################################################################
+# # SciSpacy NER models #################################################################
 # # A spaCy NER model trained on the CRAFT corpus.
 # [tool.poetry.dependencies.en_ner_craft_md]
 # url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_craft_md-0.5.1.tar.gz"
