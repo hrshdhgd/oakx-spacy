@@ -129,7 +129,8 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if (self.outfile).is_file():
             self.outfile.unlink()
         self.tsv_input = False
-        self.text_id = None
+        self.document_id = None
+        self.include_aliases = False
 
     def _clean_string_and_lemma(self, string):
         return " ".join([token.lemma_ for token in self.nlp(string)])
@@ -137,38 +138,38 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         # return " ".join([token.lemma_ for token in self.nlp(tmp_str.replace('-'," "))])
 
     def _prepare_output(self, entity: Span) -> dict:
-        """Prepare outpu doctionary for exporting.
+        """Prepare output doctionary for exporting.
 
         :param entity: Spacy's span object.
         :return: Dictionary containing output column information.
         """
-        info = {}
         output_dict = {
             "object_id": entity.ent_id_,
             "object_label": entity.label_,
+            "matched_term": entity.text,
+            "POS": ", ".join([token.pos_ for token in entity]),
             "start": entity.start_char,
             "end": entity.end_char,
             "confidence": 0.80,
+            "aliases": [],
         }
 
         if self.tsv_input:
-            output_dict["text_id"] = self.text_id
+            output_dict["document_id"] = self.document_id
 
-        for _, item in enumerate(self.oi.alias_map_by_curie(entity.ent_id_).items()):
-            if len(item) > 0:
-                if "alias" not in info:
-                    info["alias_map"] = {item[0]: item[1]}
-                else:
-                    info["alias_map"].update({item[0]: item[1]})
+        if self.include_aliases:
+            for _, item in self.oi.alias_map_by_curie(entity.ent_id_).items():
+                if len(item) > 0:
+                    output_dict["aliases"].extend(item)
 
-        for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
-            if len(item) > 0:
-                if "synonym" not in info:
-                    info["synonym_map"] = {item[0]: item[1]}
-                else:
-                    info["synonym_map"].update({item[0]: item[1]})
+        # for _, item in enumerate(self.oi.synonym_map_for_curies(entity.ent_id_).items()):
+        #     if len(item) > 0:
+        #         if "synonym" not in info:
+        #             info["synonym_map"] = {item[0]: item[1]}
+        #         else:
+        #             info["synonym_map"].update({item[0]: item[1]})
 
-        output_dict.update(info)
+        # output_dict.update(info)
         return output_dict
 
     def annotate_file(
@@ -217,34 +218,38 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         if not hasattr(self, "nlp"):
             self._setup_nlp_pipeline(configuration)
 
+        self.include_aliases = configuration.include_aliases
+
         if isinstance(text, list):
             # It is a TSV file
-            self.text_id, text = text
+            self.document_id, text = text
             self.tsv_input = True
 
         if text != "text":
             doc = self.nlp(self._clean_string_and_lemma(text))
             fieldnames = [
+                "matched_term",
                 "object_id",
                 "object_label",
+                "POS",
                 "start",
                 "end",
-                "alias_map",
-                "synonym_map",
                 "confidence",
             ]
-            if self.tsv_input and "text_id" not in fieldnames:
-                fieldnames.insert(0, "text_id")
+            if self.tsv_input and "document_id" not in fieldnames:
+                fieldnames.insert(0, "document_id")
+            if self.include_aliases:
+                fieldnames.insert(-1, "aliases")
 
             if hasattr(self, "oi"):
                 for entity in doc.ents:
                     if entity.ent_id_ and entity.text not in self.stopwords:
-                        info = {}
+                        info: dict = {}
                         output_dict = self._prepare_output(entity)
-                        for k in [
-                            key for key in output_dict.keys() if key in ["alias_map", "synonym_map"]
-                        ]:
-                            info[k] = output_dict[k]
+                        # for k in [
+                        #     key for key in output_dict.keys() if key in ["alias_map", "synonym_map"] # noqa
+                        # ]:
+                        #     info[k] = output_dict[k]
                         yield from self.write_output(output_dict, fieldnames, info)
 
                         # yield TextAnnotation(
@@ -256,6 +261,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                         # )
             else:
                 fieldnames = [
+                    "matched_term",
                     "object_id",
                     "object_label",
                     "start",
@@ -295,9 +301,9 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
                             output_dict.update(linker_dict)
                             if self.tsv_input:
-                                if "text_id" not in fieldnames:
-                                    fieldnames.insert(0, "text_id")
-                                output_dict["text_id"] = self.text_id
+                                if "document_id" not in fieldnames:
+                                    fieldnames.insert(0, "document_id")
+                                output_dict["document_id"] = self.document_id
 
                             yield from self.write_output(output_dict, fieldnames, linker_dict)
 
@@ -339,7 +345,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             )
             self.linker = self.nlp.get_pipe("scispacy_linker")
 
-    def _get_pattern_list(self, phrase, raw_phrase, curie) -> List[dict]:
+    def _get_pattern_list(self, phrase: str, raw_phrase: str, curie: str) -> List[dict]:
         """Get the list of patterns for a given phrase.
 
         :param phrase: Phrase in question within the raw_phrase.
@@ -360,8 +366,25 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             "pattern": [{self.phrase_matcher_attr: phrase.lower()}],
             "id": curie,
         }
+        list_of_patterns = [token_dict, phrase_dict]
+        if curie.startswith("NCBITaxon:"):
+            for tok in split_tokens:
+                list_of_patterns.append(
+                    {
+                        "label": raw_phrase,
+                        "pattern": [{self.phrase_matcher_attr: tok.lower()}],
+                        "id": curie,
+                    }
+                )
+                list_of_patterns.append(
+                    {
+                        "label": raw_phrase,
+                        "pattern": [{self.phrase_matcher_attr: tok}],
+                        "id": curie,
+                    }
+                )
 
-        return [token_dict, phrase_dict]
+        return list_of_patterns
 
     def _add_patterns(self):
         """Generate a list of patterns which will form the dictionary for NER.
@@ -426,13 +449,13 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         if self.tsv_input:
             yield TextAnnotation(
-                subject_text_id=output_dict["text_id"],
+                subject_text_id=output_dict["document_id"],
                 object_id=output_dict["object_id"],
                 object_label=output_dict["object_label"],
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                info=info,
+                object_aliases=output_dict["aliases"],
             )
         else:
             yield TextAnnotation(
@@ -441,5 +464,5 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                info=info,
+                object_aliases=output_dict["aliases"],
             )
