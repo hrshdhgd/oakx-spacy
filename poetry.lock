@@ -4286,4 +4286,4 @@ docs = ["myst-parser", "sphinx", "sphinx-autodoc-typehints", "sphinx-click", "sp
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "815ec27b5bf3783e1422a02847aa0e48ed13b14f43fbaed2ddb95b664fe90155"
+content-hash = "a985e9a24802e64f0c3d7721d4bd5b6c9c930ed9ff267d26b7cc46126baaaf49"
