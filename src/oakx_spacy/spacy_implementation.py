@@ -4,14 +4,16 @@ import csv
 from dataclasses import dataclass
 from io import TextIOWrapper
 from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable, List, Tuple
 
 import pystow
 import spacy
 from oaklib.datamodels.text_annotator import TextAnnotation, TextAnnotationConfiguration
 from oaklib.interfaces import TextAnnotatorInterface
+from oaklib.interfaces.basic_ontology_interface import ALIAS_MAP
 from oaklib.interfaces.obograph_interface import OboGraphInterface
 from oaklib.selector import get_implementation_from_shorthand
+from oaklib.types import CURIE, PRED_CURIE
 from scispacy.abbreviation import AbbreviationDetector  # noqa
 from scispacy.linking import EntityLinker  # noqa
 from spacy.pipeline import entityruler  # noqa
@@ -151,13 +153,13 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
             "start": entity.start_char,
             "end": entity.end_char,
             "confidence": 0.80,
-            "aliases": [],
         }
 
         if self.tsv_input:
             output_dict["document_id"] = self.document_id
 
         if self.include_aliases:
+            output_dict["aliases"] = []
             for _, item in self.oi.alias_map_by_curie(entity.ent_id_).items():
                 if len(item) > 0:
                     output_dict["aliases"].extend(item)
@@ -455,7 +457,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                object_aliases=output_dict["aliases"],
+                object_aliases=output_dict["aliases"] if self.include_aliases else None,
             )
         else:
             yield TextAnnotation(
@@ -464,5 +466,30 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 subject_start=output_dict["start"],
                 subject_end=output_dict["end"],
                 confidence=output_dict["confidence"],
-                object_aliases=output_dict["aliases"],
+                object_aliases=output_dict["aliases"] if self.include_aliases else None,
             )
+
+    def entities(self, filter_obsoletes=True, owl_type=None) -> Iterable[CURIE]:
+        """Yield entities from the underlying implementation.
+
+        :param filter_obsoletes: Boolean to filter obsoletes, defaults to True
+        :param owl_type: owl class, defaults to None
+        :yield: CURIE
+        """
+        yield from self.oi.entities()
+
+    def entity_alias_map(self, curie: CURIE) -> ALIAS_MAP:
+        """Return alias map for a CURIE.
+
+        :param curie: CURIE
+        :return: Alias map.
+        """
+        return self.oi.entity_alias_map(curie)
+
+    def simple_mappings_by_curie(self, curie: CURIE) -> Iterable[Tuple[PRED_CURIE, CURIE]]:
+        """Yield a tuple o fmappings.
+
+        :param curie: CURIE
+        :yield: Simple mappings as a tuple.
+        """
+        yield from self.oi.simple_mappings_by_curie(curie)
