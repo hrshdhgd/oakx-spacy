@@ -4,6 +4,7 @@ import csv
 from dataclasses import dataclass
 from io import TextIOWrapper
 from pathlib import Path
+import string
 from typing import Iterable, List, Tuple
 
 import pystow
@@ -371,20 +372,21 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
         list_of_patterns = [token_dict, phrase_dict]
         if curie.startswith("NCBITaxon:"):
             for tok in split_tokens:
-                list_of_patterns.append(
-                    {
-                        "label": raw_phrase,
-                        "pattern": [{self.phrase_matcher_attr: tok.lower()}],
-                        "id": curie,
-                    }
-                )
-                list_of_patterns.append(
-                    {
-                        "label": raw_phrase,
-                        "pattern": [{self.phrase_matcher_attr: tok}],
-                        "id": curie,
-                    }
-                )
+                if tok not in string.punctuation:
+                    list_of_patterns.append(
+                        {
+                            "label": raw_phrase,
+                            "pattern": [{self.phrase_matcher_attr: tok.lower()}],
+                            "id": curie,
+                        }
+                    )
+                    list_of_patterns.append(
+                        {
+                            "label": raw_phrase,
+                            "pattern": [{self.phrase_matcher_attr: tok}],
+                            "id": curie,
+                        }
+                    )
 
         return list_of_patterns
 
@@ -418,9 +420,10 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                 if "," in phrase and phrase.count(",") == 1 and not curie.startswith("CHEBI"):
                     multi_phrase = phrase.split(",")
                     for phr in multi_phrase:
-                        self.list_of_pattern_dicts.extend(
-                            self._get_pattern_list(raw_phrase=raw_phrase, phrase=phr, curie=curie)
-                        )
+                        if phr != "":
+                            self.list_of_pattern_dicts.extend(
+                                self._get_pattern_list(raw_phrase=raw_phrase, phrase=phr, curie=curie)
+                            )
 
             ruler = self.nlp.add_pipe("entity_ruler", before="ner")
             with self.nlp.select_pipes(enable="tagger"):
