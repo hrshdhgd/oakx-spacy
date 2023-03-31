@@ -161,7 +161,7 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
 
         if self.include_aliases:
             output_dict["aliases"] = []
-            for _, item in self.oi.alias_map_by_curie(entity.ent_id_).items():
+            for _, item in self.oi.alias_map(entity.ent_id_).items():
                 if len(item) > 0:
                     output_dict["aliases"].extend(item)
 
