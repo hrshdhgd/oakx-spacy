@@ -1,10 +1,10 @@
 """Spacy Implementation."""
 
 import csv
+import string
 from dataclasses import dataclass
 from io import TextIOWrapper
 from pathlib import Path
-import string
 from typing import Iterable, List, Tuple
 
 import pystow
@@ -422,7 +422,9 @@ class SpacyImplementation(TextAnnotatorInterface, OboGraphInterface):
                     for phr in multi_phrase:
                         if phr != "":
                             self.list_of_pattern_dicts.extend(
-                                self._get_pattern_list(raw_phrase=raw_phrase, phrase=phr, curie=curie)
+                                self._get_pattern_list(
+                                    raw_phrase=raw_phrase, phrase=phr, curie=curie
+                                )
                             )
 
             ruler = self.nlp.add_pipe("entity_ruler", before="ner")
