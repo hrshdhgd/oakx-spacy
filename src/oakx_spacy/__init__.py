@@ -1,4 +1,5 @@
 """oakx_spacy package."""
+
 try:
     from importlib import metadata
 except ImportError:

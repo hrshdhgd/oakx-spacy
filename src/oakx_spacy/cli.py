@@ -1,4 +1,5 @@
 """Command line interface for oakx-spacy."""
+
 import logging
 
 import click

@@ -1,4 +1,5 @@
 """Test SpacyImplementation."""
+
 import unittest
 
 from oaklib.implementations import get_implementation_resolver
